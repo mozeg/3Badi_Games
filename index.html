@@ -1139,9 +1139,9 @@ function applyLang(){
   // HTML dir + lang
   document.documentElement.lang = isAr ? 'ar' : 'en';
   document.documentElement.dir  = isAr ? 'rtl' : 'ltr';
-  // Toggle button label
-  document.getElementById('langLabel').textContent = isAr ? 'EN' : 'عر';
-  document.getElementById('langToggle').style.fontFamily = isAr ? "var(--font-ar)" : "var(--font-en)";
+  // langLabel قد يكون داخل settings panel — آمن
+  const langLabelEl = document.getElementById('langLabel');
+  if(langLabelEl) langLabelEl.textContent = isAr ? 'EN' : 'عر';
 
   // ── Login ──
   _setText('uName','placeholder', t('namePlaceholder'));
@@ -1214,14 +1214,18 @@ function applyLang(){
 }
 
 function _setText(id, prop, val){
-  const el = document.getElementById(id);
-  if(!el) return;
-  if(prop === 'placeholder') el.placeholder = val;
-  else el[prop] = val;
+  try{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(prop === 'placeholder') el.placeholder = val;
+    else el[prop] = val;
+  }catch(e){}
 }
 function _setQuery(sel, prop, val){
-  const el = document.querySelector(sel);
-  if(el) el[prop] = val;
+  try{
+    const el = document.querySelector(sel);
+    if(el) el[prop] = val;
+  }catch(e){}
 }
 
 /* ═══════════ حفظ بيانات المستخدم ══════════════════════ */
