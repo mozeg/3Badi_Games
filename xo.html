@@ -856,8 +856,8 @@ function listenBoard() {
     if (!gameOn) return;
     const w = checkWin(board);
     const filled = board.filter(v => v !== null).length;
-    if (w) { gameOn = false; boardRef.off(); boardRef = null; onRoundEnd(w); }
-    else if (filled >= 9) { gameOn = false; boardRef.off(); boardRef = null; onRoundEnd('draw'); }
+    if (w) { gameOn = false; if(boardRef){boardRef.off();boardRef=null;} onRoundEnd(w); }
+    else if (filled >= 9) { gameOn = false; if(boardRef){boardRef.off();boardRef=null;} onRoundEnd('draw'); }
   });
   // Bot logic
   if ((p1id===BOT_ID||p2id===BOT_ID) && isLeader) {
@@ -975,17 +975,51 @@ function nextRound() {
   roundN++; board = Array(9).fill(null); curTurn = 'X';
   document.getElementById('rnLabel').textContent = 'جولة ' + roundN;
   document.querySelectorAll('.cell').forEach(c => c.classList.remove('win'));
+  gameOn = false;
+  // P1 يكتب البورد الجديد في Firebase
   if (myId === p1id) {
     const empty = {}; for (let i=0;i<9;i++) empty[i]='_';
-    db.ref(`xo2/${roomCode}/boards/${matchId}`).update({ board:empty, turn:'X', round:roundN, sx:scores.X, so:scores.O });
+    db.ref(`xo2/${roomCode}/boards/${matchId}`).update({
+      board: empty, turn: 'X', round: roundN, sx: scores.X, so: scores.O
+    }).then(() => {
+      // بعد نجاح الكتابة — كلاهما يستمع
+      startNextRound();
+    }).catch(() => startNextRound());
+  } else {
+    // P2 ينتظر قليلاً ثم يستمع
+    setTimeout(startNextRound, 300);
   }
-  gameOn = false;
-  setTimeout(() => {
-    gameOn = true; renderBoard(); updateTurnUI();
-    const mt=(curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
-    document.getElementById('myTurnMsg').textContent = mt ? '🎯 دورك!' : 'انتظر دورك...';
-    listenBoard();
-  }, 400);
+}
+
+function startNextRound() {
+  renderBoard(); updateTurnUI();
+  const mt = (curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
+  document.getElementById('myTurnMsg').textContent = mt ? '🎯 دورك!' : 'انتظر دورك...';
+  // أعد الاستماع للبورد
+  if (boardRef) { boardRef.off(); boardRef = null; }
+  boardRef = db.ref(`xo2/${roomCode}/boards/${matchId}`);
+  boardRef.on('value', snap => {
+    const md = snap.val(); if (!md) return;
+    if (md.winner !== undefined) {
+      boardRef.off(); boardRef = null; onMatchEnd(md.winner); return;
+    }
+    const nb = normBoard(md.board);
+    const nt = md.turn || 'X';
+    const chg = nb.some((v,i) => v !== board[i]) || nt !== curTurn;
+    if (!chg && gameOn) return;
+    board = nb; curTurn = nt;
+    scores = { X: md.sx||scores.X, O: md.so||scores.O };
+    renderBoard(); updateTurnUI();
+    document.getElementById('scX').textContent = scores.X;
+    document.getElementById('scO').textContent = scores.O;
+    const mt2=(curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
+    document.getElementById('myTurnMsg').textContent = mt2 ? '🎯 دورك!' : 'انتظر دورك...';
+    gameOn = true;
+    const w = checkWin(board);
+    const filled = board.filter(v => v !== null).length;
+    if (w) { gameOn=false; boardRef.off(); boardRef=null; onRoundEnd(w); }
+    else if (filled >= 9) { gameOn=false; boardRef.off(); boardRef=null; onRoundEnd('draw'); }
+  });
 }
 
 function endMatch(mw) {
