@@ -497,7 +497,7 @@ function onRoundEnd(w){
       const mw=scores.X>scores.O?'X':scores.O>scores.X?'O':'draw';
       showRes(w==='X'?'❌':'⭕','🏆 فاز '+wname+'!','نهاية اللعبة');
       setResBtn('النتيجة ←',()=>{clearTimer();closeRes();endMatch(mw);});
-      startCD(4,()=>endMatch(mw));
+      startCD(4,()=>{closeRes();endMatch(mw);});
     }else{
       showRes(w==='X'?'❌':'⭕','فاز '+wname+'!',`جولة ${roundN+1} خلال 4 ثوانٍ...`);
       setResBtn('التالي الآن ←',()=>{clearTimer();closeRes();nextRound();});
@@ -535,7 +535,12 @@ function endMatch(mw){
     return;
   }
   const wid=mw==='X'?p1id:p2id;
+  // اكتب النتيجة في Firebase (للاعب الآخر)
   db.ref(`xo3/${gameCode}/board`).update({winner:wid});
+  // أظهر النتيجة مباشرة لهذا اللاعب أيضاً
+  const wname=wid===p1id?p1nm:p2nm;
+  stopMusic();
+  showFinal(wname,`${scores.X} - ${scores.O}`);
 }
 
 function onMatchEnd(winnerId){
@@ -618,7 +623,7 @@ function aiOnRoundEnd(w){
     if(done){
       showRes(w==='X'?'❌':'⭕','🏆 فاز '+wname+'!','نهاية اللعبة');
       setResBtn('النتيجة ←',()=>{clearTimer();closeRes();showFinal(iWon?myName:p2nm,scores.X+' - '+scores.O);});
-      startCD(4,()=>showFinal(iWon?myName:p2nm,scores.X+' - '+scores.O));
+      startCD(4,()=>{closeRes();showFinal(iWon?myName:p2nm,scores.X+' - '+scores.O);});
     }else{
       showRes(w==='X'?'❌':'⭕','فاز '+wname+'!',`جولة ${roundN+1} خلال 4 ثوانٍ...`);
       setResBtn('التالي الآن ←',()=>{clearTimer();closeRes();aiNextRound();});startCD(4,aiNextRound);
