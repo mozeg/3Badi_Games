@@ -212,9 +212,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="trophy" id="winTrophy">🏆</div>
   <div style="font-size:.7rem;opacity:.35;letter-spacing:3px;margin:8px 0 3px;">الفائز</div>
   <div id="winName" style="font-size:2rem;font-weight:900;color:var(--gold);text-shadow:0 0 18px var(--gold);">—</div>
-  <div id="winSub" style="font-size:.72rem;opacity:.4;margin:4px 0 18px;"></div>
-  <button class="btn btn-cyan" onclick="playAgain()">⚔️ مجدداً</button>
-  <button class="btn btn-ghost" style="margin-top:0;" onclick="goBack()">← عبادي GAMES</button>
+  <div id="winSub" style="font-size:.72rem;opacity:.4;margin:4px 0 8px;"></div>
+  <div id="winCD" style="display:none;font-family:var(--fe);font-size:2rem;font-weight:700;color:var(--o);margin-bottom:12px;text-shadow:0 0 15px var(--o);"></div>
+  <div style="font-size:.68rem;opacity:.3;margin-bottom:14px;">العودة تلقائياً...</div>
+  <button class="btn btn-ghost" style="max-width:200px;font-size:.82rem;" onclick="goBack()">← عبادي GAMES</button>
 </div>
 </div>
 
@@ -257,7 +258,7 @@ let myName='', gameCode='', vsAI=false, aiDiff='medium';
 let p1id='', p2id='', p1nm='', p2nm='', mySymbol='';
 let board=Array(9).fill(null), curTurn='X', gameOn=false;
 let scores={X:0,O:0}, roundN=1;
-let gameRef=null, nameTimer=null, codeTimer=null, codeOk=false;
+let gameRef=null, nameTimer=null, codeTimer=null, codeOk=false, winTimer=null;
 let autoTimer=null, rBtnFn=null, settOpen=false;
 let musicOn=localStorage.getItem('xo_music')!=='off', audioCtx=null, masterGain=null, bgNodes=[];
 
@@ -677,8 +678,39 @@ function showFinal(name,sub){
   document.getElementById('winTrophy').textContent='🏆';
   document.getElementById('winName').textContent=name;
   document.getElementById('winSub').textContent=sub||'';
+  // عداد العودة التلقائية
+  const cdEl=document.getElementById('winCD');
+  if(cdEl){cdEl.textContent='3';cdEl.style.display='block';}
   show('scnWinner');sfxWin();
   for(let i=0;i<15;i++){const d=document.createElement('div');d.className='pt';d.style.cssText=`left:${Math.random()*100}vw;width:${3+Math.random()*4}px;height:${3+Math.random()*4}px;background:rgba(255,215,0,.7);animation-duration:${4+Math.random()*5}s;animation-delay:-${Math.random()*3}s;`;document.body.appendChild(d);setTimeout(()=>d.remove(),9000);}
+  // 3 ثوانٍ ثم ارجع لصفحة اللعبة
+  let r=3;
+  const winTick=()=>{
+    r--;
+    if(cdEl) cdEl.textContent=r;
+    if(r<=0){ returnToGame(); return; }
+    winTimer=setTimeout(winTick,1000);
+  };
+  winTimer=setTimeout(winTick,1000);
+}
+
+function returnToGame(){
+  clearTimeout(winTimer);
+  // إعادة تهيئة لعبة جديدة بين نفس اللاعبين
+  if(vsAI){
+    scores={X:0,O:0};roundN=1;board=Array(9).fill(null);curTurn='X';gameOn=true;
+    buildBoard();show('scnBattle');
+    document.getElementById('scX').textContent=0;document.getElementById('scO').textContent=0;
+    document.getElementById('rnLabel').textContent='جولة 1';
+    renderBoard();updateTurnUI();
+    document.getElementById('myTurnMsg').textContent='🎯 دورك!';
+    if(musicOn)startMusic();
+  } else {
+    // ارجع لصفحة الاختيار مع إزالة اللعبة القديمة
+    if(gameRef){gameRef.off();gameRef=null;}
+    if(gameCode){db.ref(`xo3/${gameCode}`).remove();gameCode='';}
+    show('scnHome');
+  }
 }
 
 /* ══ SETTINGS ══ */
