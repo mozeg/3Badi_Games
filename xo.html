@@ -8,1042 +8,1350 @@
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 <style>
-:root{--x:#ff3355;--o:#00d4ff;--bg:#03030a;--gold:#ffd700;--green:#00ff88;--panel:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--fa:'Cairo',sans-serif;--fe:'Rajdhani',sans-serif;}
+/* ══ VARIABLES ══ */
+:root{
+  --x:#ff3355; --o:#00d4ff; --bg:#03030a;
+  --gold:#ffd700; --green:#00ff88;
+  --panel:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.08);
+  --fa:'Cairo',sans-serif; --fe:'Rajdhani',sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:var(--fa);position:fixed;}
-body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.025) 40px);pointer-events:none;}
-.scr{display:none;position:fixed;inset:0;z-index:10;flex-direction:column;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,16px)) 16px max(16px,env(safe-area-inset-bottom,16px));overflow-y:auto;}
-.scr.on{display:flex;animation:fin 0.35s ease both;}
-@keyframes fin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.card{background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(0,0,0,0.5));backdrop-filter:blur(20px);border:1px solid rgba(0,212,255,0.15);border-radius:clamp(18px,5vw,26px);padding:clamp(20px,5vw,30px) clamp(16px,5vw,26px);width:100%;max-width:min(400px,96vw);}
-.logo{text-align:center;margin-bottom:18px;}
-.logo-big{font-family:var(--fe);font-size:clamp(3rem,14vw,5rem);font-weight:700;line-height:1;}
-.lx{color:var(--x);text-shadow:0 0 20px var(--x);}
-.lo{color:var(--o);text-shadow:0 0 20px var(--o);}
-/* WAR-compatible name field */
-#scrLogin .inp{padding-left:44px;padding-right:80px;text-align:right;direction:rtl;}
-#scrLogin #nameStatus{font-size:0.75rem;text-align:center;min-height:18px;margin-bottom:10px;transition:all 0.3s;}
-.inp{width:100%;padding:clamp(11px,3vw,14px) 16px;border-radius:13px;border:1px solid var(--border);background:rgba(0,0,0,0.5);color:#fff;margin-bottom:10px;text-align:center;outline:none;font-size:1rem;font-family:var(--fa);transition:border-color 0.2s;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,0.025) 40px),
+             repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,0.025) 40px);}
+
+/* ══ SCREENS ══ */
+.scr{display:none;position:fixed;inset:0;z-index:10;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,16px)) 16px max(16px,env(safe-area-inset-bottom,16px));
+  overflow-y:auto;}
+.scr.on{display:flex;animation:scr-in 0.3s ease both;}
+@keyframes scr-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ══ CARD ══ */
+.card{background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(0,0,0,0.5));
+  backdrop-filter:blur(20px);border:1px solid rgba(0,212,255,0.15);
+  border-radius:clamp(18px,5vw,26px);
+  padding:clamp(20px,5vw,30px) clamp(16px,5vw,26px);
+  width:100%;max-width:min(400px,96vw);}
+
+/* ══ INPUTS ══ */
+.inp{width:100%;padding:clamp(11px,3vw,14px) 16px;border-radius:13px;
+  border:1px solid var(--border);background:rgba(0,0,0,0.5);color:#fff;
+  margin-bottom:10px;text-align:center;outline:none;font-size:1rem;
+  font-family:var(--fa);transition:border-color 0.2s;}
 .inp:focus{border-color:var(--o);}
-.btn{width:100%;padding:clamp(11px,3vw,13px);border-radius:13px;border:none;font-weight:900;cursor:pointer;transition:all 0.18s;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--fa);font-size:clamp(0.88rem,4vw,1rem);position:relative;overflow:hidden;}
-.btn-o{background:linear-gradient(135deg,#0088aa,#00d4ff);color:#000;box-shadow:0 4px 18px rgba(0,212,255,0.3);}
+
+/* ══ BUTTONS ══ */
+.btn{width:100%;padding:clamp(11px,3vw,13px);border-radius:13px;border:none;
+  font-weight:900;cursor:pointer;transition:all 0.18s;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--fa);font-size:clamp(0.88rem,4vw,1rem);}
+.btn:active:not(:disabled){transform:scale(0.97);}
+.btn:disabled{cursor:not-allowed;opacity:0.4;}
+.btn-cyan{background:linear-gradient(135deg,#00c8d4,#0088cc);color:#000;box-shadow:0 4px 18px rgba(0,200,212,0.3);}
 .btn-x{background:linear-gradient(135deg,#cc1133,#ff3355);color:#fff;box-shadow:0 4px 18px rgba(255,50,85,0.3);}
-.btn-g{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);border:1px solid var(--border);}
-.btn:active{transform:scale(0.97);}
-.btn:disabled{cursor:not-allowed!important;transform:none!important;}
-.btn-o:disabled{opacity:0.4;}
-.btn-g:disabled{opacity:0.3;}
+.btn-ghost{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);border:1px solid var(--border);}
 .divider{display:flex;align-items:center;gap:10px;margin:4px 0;opacity:0.2;font-size:0.75rem;}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:#fff;}
-#errBox{display:none;color:#ff6677;font-size:0.8rem;text-align:center;padding:8px;margin-bottom:8px;border-radius:10px;background:rgba(255,50,70,0.1);}
-#scrLobby{padding:10px 14px;justify-content:flex-start;}
-.lhdr{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;margin-bottom:10px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.12);border-radius:13px;}
-.rcode{font-family:var(--fe);font-size:1.3rem;font-weight:700;color:var(--o);letter-spacing:4px;}
+
+/* ══ LOGO ══ */
+.xo-x{font-family:var(--fe);color:var(--x);text-shadow:0 0 20px var(--x);}
+.xo-o{font-family:var(--fe);color:var(--o);text-shadow:0 0 20px var(--o);}
+
+/* ══ LOBBY ══ */
+#scnLobby{padding:10px 14px;justify-content:flex-start;}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:420px;margin-bottom:10px;}
-.pcard{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;position:relative;}
+.pcard{background:var(--panel);border:1px solid var(--border);border-radius:13px;
+  padding:10px 6px;display:flex;flex-direction:column;align-items:center;position:relative;}
 .pcard.ready{border-color:rgba(0,255,136,0.5);}
-.pav{width:40px;height:40px;border-radius:10px;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid var(--border);}
-.pnm{font-size:0.58rem;font-weight:700;margin-top:5px;text-align:center;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.crown{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:0.85rem;}
-/* chat popup */
-#xoChatPopup{position:fixed;bottom:0;left:0;right:0;z-index:9995;
+.pav{width:40px;height:40px;border-radius:10px;background:rgba(0,0,0,0.4);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid var(--border);}
+.pnm{font-size:0.58rem;font-weight:700;margin-top:5px;text-align:center;max-width:65px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lhdr{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;
+  padding:8px 12px;margin-bottom:10px;background:rgba(0,212,255,0.06);
+  border:1px solid rgba(0,212,255,0.12);border-radius:13px;}
+.rcode{font-family:var(--fe);font-size:1.3rem;font-weight:700;color:var(--o);letter-spacing:4px;}
+
+/* ══ CHAT ══ */
+#chatPopup{position:fixed;bottom:0;left:0;right:0;z-index:9995;
   background:rgba(5,5,20,0.97);backdrop-filter:blur(16px);
   border-top:1px solid rgba(0,212,255,0.15);border-radius:20px 20px 0 0;
   padding:14px 14px max(14px,env(safe-area-inset-bottom,14px));
-  display:none;flex-direction:column;gap:8px;
-  height:min(55vh,380px);animation:slide-up 0.3s cubic-bezier(.22,1,.36,1) both;}
-@keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.xo-chat-hdr{display:flex;align-items:center;justify-content:space-between;
-  padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;}
-.xo-chat-title{font-size:0.88rem;font-weight:700;color:var(--o);}
-.xo-chat-close{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:8px;color:#fff;padding:4px 10px;cursor:pointer;font-size:0.78rem;}
-#xoChatLog{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;
-  min-height:0;-webkit-overflow-scrolling:touch;}
-.xo-chat-row{display:flex;gap:6px;align-items:flex-start;flex-shrink:0;}
-.xo-chat-bubble{max-width:85%;padding:6px 10px;border-radius:14px;border:1px solid;
-  min-width:50px;}
-.xo-chat-bubble.me{background:rgba(0,212,255,0.12);border-color:rgba(0,212,255,0.25);border-radius:14px 14px 4px 14px;}
-.xo-chat-bubble.them{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);border-radius:14px 14px 14px 4px;}
-.xo-chat-name{font-size:0.65rem;font-weight:700;margin-bottom:2px;}
-.xo-chat-text{font-size:0.78rem;line-height:1.4;}
-.xo-chat-inp-row{display:flex;gap:8px;flex-shrink:0;}
+  display:none;flex-direction:column;gap:8px;height:min(55vh,380px);
+  animation:slide-up 0.3s cubic-bezier(.22,1,.36,1) both;}
+@keyframes slide-up{from{transform:translateY(100%)}to{transform:none}}
+#chatLog{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;min-height:0;}
+.chat-bubble{max-width:85%;padding:6px 10px;border-radius:14px;border:1px solid;}
+.chat-bubble.me{background:rgba(0,212,255,0.12);border-color:rgba(0,212,255,0.25);
+  border-radius:14px 14px 4px 14px;align-self:flex-end;}
+.chat-bubble.them{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);
+  border-radius:14px 14px 14px 4px;}
+.chat-name{font-size:0.65rem;font-weight:700;margin-bottom:2px;}
+.chat-txt{font-size:0.78rem;line-height:1.4;word-break:break-word;}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;
+  border-radius:50%;background:#ff3344;border:2px solid var(--bg);display:none;}
 .cinp{flex:1;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:10px;
   color:#fff;padding:8px 12px;font-size:0.82rem;font-family:var(--fa);outline:none;}
-.cinp:focus{border-color:rgba(0,212,255,0.3);}
-.csnd{background:var(--o);border:none;border-radius:10px;width:38px;color:#000;cursor:pointer;font-size:0.85rem;}
-#xoChatBackdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9994;}
-/* notif dot */
-.xo-notif{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;
-  background:#ff3344;border:2px solid var(--bg);display:none;animation:pdot 1s infinite;}
-@keyframes pdot{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
-/* chat btn in lobby */
-.chatbox{width:100%;max-width:420px;margin-bottom:8px;}
-#scrBattle{padding:8px 14px;justify-content:flex-start;gap:6px;}
-.mhdr{width:100%;max-width:min(360px,92vw);display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:13px;flex-shrink:0;}
+.csnd{background:var(--o);border:none;border-radius:10px;width:38px;color:#000;cursor:pointer;}
+#chatBackdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9994;}
+
+/* ══ BATTLE ══ */
+#scnBattle{padding:8px 14px;justify-content:flex-start;gap:6px;}
+.mhdr{width:100%;max-width:min(360px,92vw);display:flex;align-items:center;
+  justify-content:space-between;padding:8px 12px;
+  background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:13px;flex-shrink:0;}
 .pside{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:65px;}
 .psym{font-family:var(--fe);font-size:1.4rem;font-weight:700;}
 .pnhdr{font-size:0.56rem;opacity:0.65;max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
-.turn-ind{font-size:0.7rem;font-weight:700;padding:4px 12px;border-radius:50px;border:1px solid;transition:all 0.25s;}
+.turn-badge{font-size:0.7rem;font-weight:700;padding:4px 12px;border-radius:50px;border:1px solid;transition:all 0.25s;}
 .tx{background:rgba(255,50,85,0.15);border-color:rgba(255,50,85,0.4);color:var(--x);}
 .to{background:rgba(0,212,255,0.15);border-color:rgba(0,212,255,0.4);color:var(--o);}
-.sbar{width:100%;max-width:min(360px,92vw);display:flex;align-items:center;justify-content:space-between;padding:6px 14px;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid var(--border);flex-shrink:0;}
-.sitem{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.sbar{width:100%;max-width:min(360px,92vw);display:flex;align-items:center;
+  justify-content:space-between;padding:6px 14px;
+  background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid var(--border);flex-shrink:0;}
 .snum{font-family:var(--fe);font-size:1.4rem;font-weight:700;}
 .slbl{font-size:0.52rem;opacity:0.35;letter-spacing:2px;}
-.rinfo{font-size:0.62rem;opacity:0.45;text-align:center;}
+
+/* ══ BOARD ══ */
 .bwrap{width:100%;max-width:min(340px,90vw);margin:0 auto;flex-shrink:0;}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(6px,2vw,9px);padding:clamp(10px,3vw,14px);background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:18px;}
-.cell{aspect-ratio:1;border-radius:clamp(10px,3vw,15px);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:var(--fe);font-size:clamp(1.8rem,10vw,2.8rem);font-weight:700;cursor:pointer;transition:all 0.15s;user-select:none;}
-.cell:hover:not(.taken){background:rgba(255,255,255,0.09);transform:scale(0.95);}
-.cell:active:not(.taken){transform:scale(0.87);}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(6px,2vw,9px);
+  padding:clamp(10px,3vw,14px);background:rgba(0,0,0,0.4);
+  border:1px solid var(--border);border-radius:18px;}
+.cell{aspect-ratio:1;border-radius:clamp(10px,3vw,15px);
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fe);font-size:clamp(1.8rem,10vw,2.8rem);font-weight:700;
+  cursor:pointer;transition:all 0.15s;user-select:none;}
+.cell:active{transform:scale(0.87);}
 .cell.taken{cursor:default;}
-.cell.cx{color:var(--x);background:rgba(255,50,85,0.1);border-color:rgba(255,50,85,0.3);text-shadow:0 0 14px var(--x);animation:cpop 0.22s ease;}
-.cell.co{color:var(--o);background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);text-shadow:0 0 14px var(--o);animation:cpop 0.22s ease;}
+.cell.cx{color:var(--x);background:rgba(255,50,85,0.1);border-color:rgba(255,50,85,0.3);
+  text-shadow:0 0 14px var(--x);animation:cpop 0.22s ease;}
+.cell.co{color:var(--o);background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);
+  text-shadow:0 0 14px var(--o);animation:cpop 0.22s ease;}
 .cell.win{animation:wf 0.55s ease infinite alternate;}
 @keyframes cpop{0%{transform:scale(0.4);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes wf{0%{filter:brightness(1)}100%{filter:brightness(2.2);box-shadow:0 0 18px currentColor;}}
-#resOverlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+
+/* ══ OVERLAYS ══ */
+#resOverlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(12px);display:none;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:20px;}
 .remi{font-size:4rem;margin-bottom:10px;}
 .rtit{font-size:clamp(1.3rem,7vw,2rem);font-weight:900;margin-bottom:6px;}
-.rsub{font-size:0.8rem;opacity:0.5;margin-bottom:18px;}
-#diffModal{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
-.dcard{background:linear-gradient(135deg,rgba(0,212,255,0.07),rgba(0,0,0,0.6));border:1px solid rgba(0,212,255,0.2);border-radius:22px;padding:26px 22px;width:100%;max-width:300px;text-align:center;}
-.dbtn{width:100%;padding:12px;border-radius:13px;border:1px solid;margin-bottom:9px;cursor:pointer;font-family:var(--fa);font-weight:700;font-size:0.88rem;background:rgba(0,0,0,0.4);color:#fff;display:flex;align-items:center;gap:10px;transition:all 0.16s;}
+.rsub{font-size:0.8rem;opacity:0.5;margin-bottom:6px;}
+#rCountdown{font-family:var(--fe);font-size:2.5rem;font-weight:700;color:var(--o);
+  min-height:40px;margin-bottom:12px;}
+#diffModal{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,0.88);
+  backdrop-filter:blur(12px);display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:20px;}
+.dcard{background:linear-gradient(135deg,rgba(0,212,255,0.07),rgba(0,0,0,0.6));
+  border:1px solid rgba(0,212,255,0.2);border-radius:22px;padding:26px 22px;
+  width:100%;max-width:300px;text-align:center;}
+.dbtn{width:100%;padding:12px;border-radius:13px;border:1px solid;margin-bottom:9px;
+  cursor:pointer;font-family:var(--fa);font-weight:700;font-size:0.88rem;
+  background:rgba(0,0,0,0.4);color:#fff;display:flex;align-items:center;gap:10px;transition:all 0.16s;}
 .dbtn:hover{transform:translateY(-1px);}
-.de{border-color:rgba(0,255,136,0.4);}.dm{border-color:rgba(255,200,0,0.4);}.dh{border-color:rgba(255,50,85,0.4);}
-#scrTournament{padding:10px 14px;justify-content:flex-start;overflow-y:auto;}
-.trlist{width:100%;max-width:380px;display:flex;flex-direction:column;gap:8px;margin-top:12px;}
-.trow{display:flex;align-items:center;gap:10px;border-radius:13px;padding:9px 13px;border:1px solid;}
+.de{border-color:rgba(0,255,136,0.4);}
+.dm{border-color:rgba(255,200,0,0.4);}
+.dh{border-color:rgba(255,50,85,0.4);}
+
+/* ══ TOURNAMENT ══ */
+#scnTournament{padding:10px 14px;justify-content:flex-start;overflow-y:auto;}
+.trow{display:flex;align-items:center;gap:10px;border-radius:13px;padding:9px 13px;
+  border:1px solid;margin-bottom:6px;}
 .trow.act{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.06);}
 .trow.out{border-color:rgba(255,255,255,0.06);opacity:0.5;}
-#scrWinner{text-align:center;}
+
+/* ══ WINNER ══ */
 .trophy{font-size:5rem;animation:tb 1s ease infinite alternate;filter:drop-shadow(0 0 25px var(--gold));}
 @keyframes tb{from{transform:translateY(0)}to{transform:translateY(-10px)}}
-#aiThink{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);border:1px solid rgba(0,212,255,0.3);border-radius:50px;padding:8px 18px;font-size:0.76rem;color:var(--o);display:none;z-index:200;}
+
+/* ══ SETTINGS ══ */
+#settBtn{position:fixed;top:12px;right:12px;z-index:9998;width:38px;height:38px;
+  border-radius:50%;background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);color:#fff;font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+#settBtn:hover{background:rgba(0,212,255,0.15);border-color:rgba(0,212,255,0.35);}
+#settPanel{position:fixed;top:58px;right:12px;z-index:9997;
+  background:rgba(5,5,20,0.97);border:1px solid rgba(0,212,255,0.2);
+  backdrop-filter:blur(20px);border-radius:18px;padding:12px;width:190px;
+  display:none;flex-direction:column;gap:7px;box-shadow:0 10px 40px rgba(0,0,0,0.6);}
+.sp-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:11px;
+  border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);
+  cursor:pointer;font-family:var(--fa);color:#fff;font-size:0.85rem;font-weight:600;
+  width:100%;text-align:right;transition:all 0.18s;}
+.sp-btn:hover{background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.25);}
+
+/* ══ AI THINKING ══ */
+#aiThink{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.85);border:1px solid rgba(0,212,255,0.3);
+  border-radius:50px;padding:8px 18px;font-size:0.76rem;color:var(--o);display:none;z-index:200;}
+
+/* ══ PARTICLES ══ */
 .pt{position:fixed;pointer-events:none;border-radius:50%;animation:fp linear infinite;}
 @keyframes fp{0%{transform:translateY(100vh);opacity:0}10%{opacity:0.6}90%{opacity:0.2}100%{transform:translateY(-10vh);opacity:0}}
-::-webkit-scrollbar{width:2px;height:2px;}::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.2);border-radius:2px;}
-/* Settings */
-#xoSettingsBtn{position:fixed;top:12px;right:12px;z-index:9998;width:38px;height:38px;border-radius:50%;
-  background:rgba(0,0,0,0.65);border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(10px);
-  color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
-#xoSettingsBtn:hover{background:rgba(0,212,255,0.15);border-color:rgba(0,212,255,0.35);}
-#xoSettingsPanel{position:fixed;top:58px;right:12px;z-index:9997;
-  background:rgba(5,5,20,0.96);border:1px solid rgba(0,212,255,0.2);
-  backdrop-filter:blur(20px);border-radius:18px;padding:12px;width:200px;
-  display:none;flex-direction:column;gap:8px;
-  box-shadow:0 10px 40px rgba(0,0,0,0.6);}
-.xsp-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;
-  border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);
-  cursor:pointer;transition:all 0.18s;font-family:var(--fa);color:#fff;
-  font-size:0.85rem;font-weight:600;width:100%;text-align:right;}
-.xsp-btn:hover{background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.25);}
-.xsp-icon{font-size:1rem;min-width:22px;text-align:center;}
-.xsp-badge{font-size:0.58rem;padding:2px 6px;border-radius:50px;background:rgba(0,212,255,0.15);color:var(--o);border:1px solid rgba(0,212,255,0.2);}
+
+::-webkit-scrollbar{width:2px;height:2px;}
+::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.2);border-radius:2px;}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
 <div id="aiThink">🤖 يفكر...</div>
-<button id="xoSettingsBtn" onclick="toggleXOSettings()">⚙️</button>
-<div id="xoSettingsPanel">
-  <div style="font-size:0.58rem;letter-spacing:3px;opacity:0.3;text-align:center;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,0.06);">الإعدادات</div>
-  <button class="xsp-btn" onclick="toggleXOMusic();renderXOSettings()">
-    <span class="xsp-icon" id="xoMusicIcon">🎵</span>
-    <span id="xoMusicLabel">الموسيقى</span>
-    <span class="xsp-badge" id="xoMusicBadge">شغّال</span>
+<button id="settBtn" onclick="toggleSett()">⚙️</button>
+<div id="settPanel">
+  <div style="font-size:0.58rem;letter-spacing:3px;opacity:0.3;text-align:center;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06);">الإعدادات</div>
+  <button class="sp-btn" onclick="toggleMusic()">
+    <span id="musicIcon">🎵</span><span id="musicLabel">إيقاف الموسيقى</span>
   </button>
   <div style="height:1px;background:rgba(255,255,255,0.06);"></div>
-  <button class="xsp-btn" onclick="xoConfirmLeave()">
-    <span class="xsp-icon">🚪</span>
-    <span style="color:#ff6677;">مغادرة</span>
+  <button class="sp-btn" onclick="confirmLeave()">
+    <span>🚪</span><span style="color:#ff6677;">مغادرة</span>
   </button>
 </div>
-<!-- STEP 1: NAME (WAR style) -->
-<div id="scrLogin" class="scr on">
+
+<!-- ════════════════ SCREEN: LOGIN ════════════════ -->
+<div id="scnLogin" class="scr on">
 <div class="card">
-  <div class="logo" style="text-align:center;margin-bottom:14px;">
-    <div style="font-size:0.6rem;opacity:0.25;letter-spacing:4px;margin-bottom:4px;color:rgba(255,255,255,0.5);">عبادي</div>
-    <div class="logo-big"><span class="lx">X</span><span class="lo">O</span></div>
+  <div style="text-align:center;margin-bottom:16px;">
+    <div style="font-size:0.6rem;opacity:0.25;letter-spacing:4px;margin-bottom:3px;">عبادي</div>
+    <div style="font-size:clamp(3rem,14vw,5rem);font-weight:700;line-height:1;">
+      <span class="xo-x">X</span><span class="xo-o">O</span>
+    </div>
     <div style="font-size:0.65rem;opacity:0.3;letter-spacing:3px;margin-top:3px;">الملحمي</div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;font-size:0.68rem;opacity:0.6;">
-      <div style="display:flex;align-items:center;gap:5px;">
-        <div id="xoConnDot" style="width:7px;height:7px;border-radius:50%;background:#888;transition:background 0.3s;"></div>
-        <span id="xoConnTxt">جاري الاتصال...</span>
-      </div>
-      <span id="xoSavedBadge" style="display:none;background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.25);border-radius:50px;padding:2px 10px;color:#00ff88;font-size:0.65rem;">💾 حساب محفوظ</span>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-size:0.68rem;opacity:0.6;">
+      <div id="connDot" style="width:7px;height:7px;border-radius:50%;background:#888;transition:background 0.3s;"></div>
+      <span id="connTxt">جاري الاتصال...</span>
+      <span id="savedBadge" style="display:none;background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.25);border-radius:50px;padding:2px 10px;color:#00ff88;font-size:0.65rem;">💾 حساب محفوظ</span>
     </div>
   </div>
 
-  <div id="errBox" style="display:none;color:#ff6677;font-size:0.8rem;text-align:center;padding:8px;margin-bottom:8px;border-radius:10px;background:rgba(255,50,70,0.1);"></div>
+  <div id="loginErr" style="display:none;color:#ff6677;font-size:0.8rem;text-align:center;padding:8px;margin-bottom:8px;border-radius:10px;background:rgba(255,50,70,0.1);"></div>
 
-  <!-- Name field WAR style -->
-  <div style="position:relative;width:100%;margin-bottom:6px;">
+  <div style="position:relative;width:100%;margin-bottom:5px;">
     <input class="inp" id="uName" type="text" placeholder="🎖️ اسمك في الميدان"
       maxlength="16" autocomplete="off"
-      style="margin-bottom:0;padding-left:44px;padding-right:80px;"
-      oninput="checkName(this.value)">
+      style="margin-bottom:0;padding-left:44px;padding-right:80px;text-align:right;direction:rtl;"
+      oninput="onNameInput(this.value)">
     <div id="nameIcon" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem;pointer-events:none;"></div>
-    <button id="xoChangeBtn" onclick="xoChangeName()" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.6);font-size:0.65rem;padding:4px 8px;cursor:pointer;font-family:var(--fa);">تغيير</button>
+    <button id="changeBtn" onclick="changeName()" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.6);font-size:0.65rem;padding:4px 8px;cursor:pointer;font-family:var(--fa);">تغيير</button>
   </div>
-  <div id="nameStatus" style="font-size:0.75rem;text-align:center;min-height:18px;margin-bottom:10px;transition:all 0.3s;"></div>
+  <div id="nameSt" style="font-size:0.75rem;text-align:center;min-height:18px;margin-bottom:10px;transition:all 0.3s;"></div>
 
-  <button class="btn btn-o" id="confirmBtn" onclick="goToParty()" disabled
-    style="opacity:0.4;cursor:not-allowed;background:linear-gradient(135deg,#00c8d4,#0088cc);color:#000;">
+  <button class="btn btn-cyan" id="enterBtn" onclick="goToParty()" disabled>
     🎮 دخول إلى الميدان
   </button>
-  <button class="btn btn-g" style="margin-top:4px;opacity:0.55;font-size:0.8rem;" onclick="goBack()">← عبادي GAMES</button>
+  <button class="btn btn-ghost" style="opacity:0.5;font-size:0.8rem;margin-top:0;" onclick="goBack()">← عبادي GAMES</button>
 </div>
 </div>
 
-<!-- STEP 2: PARTY -->
-<div id="scrParty" class="scr">
+<!-- ════════════════ SCREEN: PARTY ════════════════ -->
+<div id="scnParty" class="scr">
 <div class="card">
-  <!-- Back + welcome -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-    <button onclick="show('scrLogin')" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;color:#fff;cursor:pointer;font-size:0.9rem;flex-shrink:0;">←</button>
+    <button onclick="show('scnLogin')" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;color:#fff;cursor:pointer;font-size:0.9rem;flex-shrink:0;">←</button>
     <div>
       <div style="font-size:0.58rem;opacity:0.35;letter-spacing:2px;">مرحباً</div>
-      <div style="font-weight:900;font-size:1rem;" id="partyHiName">—</div>
+      <div style="font-weight:900;font-size:1rem;" id="partyName">—</div>
     </div>
-    <div style="margin-right:auto;font-size:1.4rem;" id="partyAvatar"></div>
+    <div style="margin-right:auto;font-size:1.4rem;" id="partyAv">🥷</div>
   </div>
 
-  <div id="partyErrBox" style="display:none;color:#ff6677;font-size:0.78rem;text-align:center;padding:7px;margin-bottom:8px;border-radius:10px;background:rgba(255,50,70,0.1);"></div>
+  <div id="partyErr" style="display:none;color:#ff6677;font-size:0.78rem;text-align:center;padding:7px;margin-bottom:8px;border-radius:10px;background:rgba(255,50,70,0.1);"></div>
 
-  <!-- Create room -->
-  <button class="btn btn-o" onclick="createRoom()">👑 إنشاء بارتي جديد</button>
+  <button class="btn btn-cyan" onclick="createRoom()">👑 إنشاء بارتي</button>
+  <button class="btn btn-ghost" onclick="openDiff()">🤖 ضد الذكاء الاصطناعي</button>
+  <div class="divider">أو انضم</div>
 
-  <!-- VS AI -->
-  <button class="btn btn-g" onclick="openDiff()">🤖 العب ضد الذكاء الاصطناعي</button>
-
-  <div class="divider">أو انضم لبارتي</div>
-
-  <!-- Join with code check -->
   <div style="position:relative;width:100%;margin-bottom:5px;">
     <input class="inp" id="rCode" placeholder="🔑 كود البارتي"
       maxlength="6" style="letter-spacing:4px;text-transform:uppercase;margin-bottom:0;padding-left:42px;"
-      autocomplete="off" oninput="checkCode(this.value)">
+      autocomplete="off" oninput="onCodeInput(this.value)">
     <div id="codeIcon" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;"></div>
   </div>
-  <div id="codeStatus" style="font-size:0.72rem;text-align:center;min-height:16px;margin-bottom:8px;transition:all 0.2s;"></div>
+  <div id="codeSt" style="font-size:0.72rem;text-align:center;min-height:16px;margin-bottom:8px;transition:all 0.2s;"></div>
+  <button class="btn btn-ghost" id="joinBtn" onclick="joinRoom()" disabled>🚪 انضمام سريع</button>
+</div>
+</div>
 
-  <button class="btn btn-g" id="joinBtn" onclick="joinRoom()" disabled style="opacity:0.4;cursor:not-allowed;">
-    🚪 انضمام سريع
-  </button>
-</div>
-</div>
-<!-- LOBBY -->
-<div id="scrLobby" class="scr">
+<!-- ════════════════ SCREEN: LOBBY ════════════════ -->
+<div id="scnLobby" class="scr">
   <div class="lhdr">
-    <div><div style="font-size:0.55rem;opacity:0.3;letter-spacing:2px;">كود الغرفة</div><div class="rcode" id="dispCode">----</div></div>
+    <div>
+      <div style="font-size:0.55rem;opacity:0.3;letter-spacing:2px;">كود الغرفة</div>
+      <div class="rcode" id="dispCode">----</div>
+    </div>
     <div style="font-size:0.65rem;color:var(--green);"><span id="rdyC">0</span>/<span id="totC">0</span> جاهز</div>
   </div>
   <div style="font-size:0.55rem;letter-spacing:3px;opacity:0.28;margin-bottom:6px;text-align:center;width:100%;max-width:420px;">اللاعبون</div>
   <div class="pgrid" id="pList" style="max-width:420px;"></div>
-  <!-- Chat button -->
-  <div class="chatbox">
-    <button class="btn btn-g" onclick="openXOChat()" style="position:relative;margin-bottom:0;">
-      💬 المحادثة
-      <span class="xo-notif" id="xoNotifDot"></span>
+  <div style="width:100%;max-width:420px;border-radius:13px;border:1px solid var(--border);margin-bottom:8px;">
+    <button class="btn btn-ghost" onclick="openChat()" style="position:relative;margin-bottom:0;border-radius:13px;">
+      💬 المحادثة <span class="notif-dot" id="notifDot"></span>
     </button>
   </div>
-  <!-- hidden log for sync -->
-  <div id="chatLog" style="display:none;"></div>
   <div style="display:flex;gap:6px;width:100%;max-width:420px;margin-bottom:6px;">
-    <button class="btn btn-o" style="flex:2;" id="rdyBtn" onclick="toggleReady()">✓ جاهز</button>
-    <button class="btn btn-g" style="flex:1;" onclick="leaveRoom()">🚪</button>
+    <button class="btn btn-cyan" style="flex:2;" id="rdyBtn" onclick="toggleReady()">✓ جاهز</button>
+    <button class="btn btn-ghost" style="flex:1;" onclick="leaveRoom()">🚪</button>
   </div>
-  <button id="startBtn" class="btn btn-x" style="display:none;max-width:420px;" onclick="requestStart()">⚔️ ابدأ البطولة!</button>
-  <div id="waitMsg" style="font-size:0.7rem;opacity:0.35;text-align:center;display:none;">انتظر موافقة الجميع...</div>
+  <button id="startBtn" class="btn btn-x" style="display:none;max-width:420px;" onclick="startTournament()">⚔️ ابدأ!</button>
+  <div id="waitMsg" style="font-size:0.7rem;opacity:0.35;text-align:center;display:none;">انتظر الليدر...</div>
 </div>
-<!-- BATTLE -->
-<div id="scrBattle" class="scr">
-  <div class="mhdr" style="width:100%;max-width:min(360px,92vw);">
-    <div class="pside"><div class="psym" style="color:var(--x);" id="sym1">X</div><div class="pnhdr" id="nm1">—</div></div>
+
+<!-- ════════════════ SCREEN: BATTLE ════════════════ -->
+<div id="scnBattle" class="scr">
+  <div class="mhdr" style="max-width:min(360px,92vw);">
+    <div class="pside">
+      <div class="psym" style="color:var(--x);" id="bNm1">X</div>
+      <div class="pnhdr" id="bP1">—</div>
+    </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
       <div style="font-family:var(--fe);font-size:0.8rem;font-weight:700;opacity:0.35;">VS</div>
-      <div class="turn-ind tx" id="turnInd">دور X</div>
+      <div class="turn-badge tx" id="turnBadge">دور X</div>
     </div>
-    <div class="pside"><div class="psym" style="color:var(--o);" id="sym2">O</div><div class="pnhdr" id="nm2">—</div></div>
+    <div class="pside">
+      <div class="psym" style="color:var(--o);" id="bNm2">O</div>
+      <div class="pnhdr" id="bP2">—</div>
+    </div>
   </div>
-  <div class="sbar" style="width:100%;max-width:min(360px,92vw);">
-    <div class="sitem"><div class="snum" id="scX" style="color:var(--x);">0</div><div class="slbl">X</div></div>
-    <div class="sitem"><div class="rinfo" id="rnInfo">جولة 1</div><div class="slbl">ROUND</div></div>
-    <div class="sitem"><div class="snum" id="scO" style="color:var(--o);">0</div><div class="slbl">O</div></div>
+  <div class="sbar" style="max-width:min(360px,92vw);">
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div class="snum" id="scX" style="color:var(--x);">0</div><div class="slbl">X</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div style="font-size:0.62rem;opacity:0.45;" id="rnLabel">جولة 1</div><div class="slbl">ROUND</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div class="snum" id="scO" style="color:var(--o);">0</div><div class="slbl">O</div>
+    </div>
   </div>
   <div class="bwrap"><div class="board" id="board"></div></div>
   <div style="font-size:0.68rem;opacity:0.35;margin-top:6px;text-align:center;flex-shrink:0;" id="myTurnMsg"></div>
 </div>
-<!-- TOURNAMENT -->
-<div id="scrTournament" class="scr">
-  <div style="text-align:center;margin-bottom:8px;">
+
+<!-- ════════════════ SCREEN: TOURNAMENT ════════════════ -->
+<div id="scnTournament" class="scr">
+  <div style="text-align:center;margin-bottom:10px;">
     <div style="font-family:var(--fe);font-size:1.5rem;font-weight:700;color:var(--o);">🏆 البطولة</div>
     <div id="tournMsg" style="font-size:0.72rem;opacity:0.45;margin-top:3px;"></div>
   </div>
-  <div class="trlist" id="trList"></div>
+  <div id="trList" style="width:100%;max-width:380px;"></div>
 </div>
-<!-- WINNER -->
-<div id="scrWinner" class="scr">
+
+<!-- ════════════════ SCREEN: WINNER ════════════════ -->
+<div id="scnWinner" class="scr">
 <div class="card" style="text-align:center;">
   <div class="trophy" id="winTrophy">🏆</div>
   <div style="font-size:0.7rem;opacity:0.35;letter-spacing:3px;margin:8px 0 3px;">البطل</div>
   <div id="winName" style="font-size:2rem;font-weight:900;color:var(--gold);text-shadow:0 0 18px var(--gold);">—</div>
-  <div id="winStats" style="font-size:0.72rem;opacity:0.4;margin-top:3px;margin-bottom:18px;"></div>
-  <button class="btn btn-o" onclick="playAgain()">⚔️ جولة جديدة</button>
-  <button class="btn btn-g" style="margin-top:0;" onclick="goBack()">← عبادي GAMES</button>
+  <div id="winSub" style="font-size:0.72rem;opacity:0.4;margin:4px 0 18px;"></div>
+  <button class="btn btn-cyan" onclick="playAgain()">⚔️ جولة جديدة</button>
+  <button class="btn btn-ghost" style="margin-top:0;" onclick="goBack()">← عبادي GAMES</button>
 </div>
 </div>
-<!-- RESULT OVERLAY -->
+
+<!-- ════════════════ RESULT OVERLAY ════════════════ -->
 <div id="resOverlay">
   <div class="remi" id="rEmi">🎉</div>
   <div class="rtit" id="rTit">—</div>
   <div class="rsub" id="rSub"></div>
-  <div id="rCountdown" style="font-family:var(--fe);font-size:2.5rem;font-weight:700;color:var(--o);text-shadow:0 0 15px var(--o);min-height:40px;margin-bottom:8px;animation:cd-pulse 1s ease infinite alternate;"></div>
-  <button class="btn btn-o" style="max-width:180px;" id="rBtn" onclick="onResBtn()">التالي ←</button>
+  <div id="rCountdown"></div>
+  <button class="btn btn-cyan" style="max-width:180px;" id="rBtn" onclick="rBtnFn&&rBtnFn()">التالي ←</button>
 </div>
-<!-- DIFFICULTY -->
+
+<!-- ════════════════ DIFFICULTY MODAL ════════════════ -->
 <div id="diffModal">
 <div class="dcard">
-  <div style="font-size:1rem;font-weight:900;margin-bottom:4px;">🤖 الصعوبة</div>
+  <div style="font-size:1rem;font-weight:900;margin-bottom:4px;">🤖 مستوى الصعوبة</div>
   <div style="font-size:0.68rem;opacity:0.35;margin-bottom:16px;">اختر مستوى الذكاء الاصطناعي</div>
-  <button class="dbtn de" onclick="startAI('easy')">🟢 <div style="text-align:right;"><div>سهل</div><div style="font-size:0.58rem;opacity:0.45;">يخطئ أحياناً</div></div></button>
-  <button class="dbtn dm" onclick="startAI('medium')">🟡 <div style="text-align:right;"><div>متوسط</div><div style="font-size:0.58rem;opacity:0.45;">ذكاء معقول</div></div></button>
-  <button class="dbtn dh" onclick="startAI('hard')">🔴 <div style="text-align:right;"><div>صعب — Minimax</div><div style="font-size:0.58rem;opacity:0.45;">لا يُهزم تقريباً</div></div></button>
-  <button class="btn btn-g" style="margin-top:4px;" onclick="closeDiff()">إلغاء</button>
+  <button class="dbtn de" onclick="startVsAI('easy')">🟢 <div style="text-align:right;"><div>سهل</div><div style="font-size:0.58rem;opacity:0.45;">يخطئ أحياناً</div></div></button>
+  <button class="dbtn dm" onclick="startVsAI('medium')">🟡 <div style="text-align:right;"><div>متوسط</div><div style="font-size:0.58rem;opacity:0.45;">ذكاء معقول</div></div></button>
+  <button class="dbtn dh" onclick="startVsAI('hard')">🔴 <div style="text-align:right;"><div>صعب — Minimax</div><div style="font-size:0.58rem;opacity:0.45;">لا يُهزم تقريباً</div></div></button>
+  <button class="btn btn-ghost" style="margin-top:4px;" onclick="document.getElementById('diffModal').style.display='none'">إلغاء</button>
 </div>
 </div>
-<!-- XO Chat Popup -->
-<div id="xoChatBackdrop" onclick="closeXOChat()"></div>
-<div id="xoChatPopup">
-  <div class="xo-chat-hdr">
-    <div class="xo-chat-title">💬 المحادثة</div>
-    <button class="xo-chat-close" onclick="closeXOChat()">✕</button>
+
+<!-- ════════════════ CHAT POPUP ════════════════ -->
+<div id="chatBackdrop" onclick="closeChat()"></div>
+<div id="chatPopup">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
+    <div style="font-size:0.88rem;font-weight:700;color:var(--o);">💬 المحادثة</div>
+    <button onclick="closeChat()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;padding:4px 10px;cursor:pointer;font-size:0.78rem;">✕</button>
   </div>
-  <div id="xoChatLog"></div>
-  <div class="xo-chat-inp-row">
+  <div id="chatLog"></div>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
     <input class="cinp" id="chatInp" placeholder="قل شيئاً..." maxlength="50" autocomplete="off">
     <button class="csnd" onclick="sendChat()">➤</button>
   </div>
 </div>
 
 <script>
-const FB={apiKey:"AIzaSyBJV_Nu4eUDFhOcSR271SUj9IunkS6Mh08",authDomain:"game-2-ac5cc.firebaseapp.com",projectId:"game-2-ac5cc",databaseURL:"https://game-2-ac5cc-default-rtdb.firebaseio.com"};
-if(!firebase.apps.length)firebase.initializeApp(FB);
-const db=firebase.database();
-let nameOk=false,nameTimer=null,codeOk=false,codeTimer=null;
-let myId=localStorage.getItem('xo_id')||(()=>{const id='xo_'+Math.random().toString(36).substr(2,8);localStorage.setItem('xo_id',id);return id;})();
-let myName='',roomCode='',isLeader=false,isReady=false,vsAI=false,aiDiff='medium';
-const AVTS=['🥷','🧙','⚔️','🛡️','🏹','⚡','🦊','🐉','💣','🔱'];
-let myAv=localStorage.getItem('xo_av')||(()=>{const a=AVTS[Math.floor(Math.random()*AVTS.length)];localStorage.setItem('xo_av',a);return a;})();
-let board=Array(9).fill(null),curTurn='X',mySymbol='',gameOn=false,xoIAm=false;
-let scores={X:0,O:0},roundN=1;
-let p1id='',p2id='',p1nm='',p2nm='';
-let tourn={players:[]};
-let matchRef=null,lobbyRef=null;
-const WINS=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-// Connection dot
-(()=>{const dot=document.getElementById('xoConnDot');const txt=document.getElementById('xoConnTxt');
-try{db.ref('.info/connected').on('value',s=>{
-  if(s.val()){
-    if(dot)dot.style.background='#00ff88';
-    if(txt)txt.textContent='متصل';
-    // إذا كان الاسم موجوداً وlm يُتحقق منه بعد → تحقق الآن
-    const inp=document.getElementById('uName');
-    if(inp&&inp.value.trim().length>=2&&!nameOk){checkName(inp.value.trim());}
-  } else {
-    if(dot)dot.style.background='#ff5566';
-    if(txt)txt.textContent='غير متصل';
-  }
-});}catch(e){}})();
+/* ══════════════════════════════════════════
+   FIREBASE — XO dedicated project
+══════════════════════════════════════════ */
+const FB = {
+  apiKey: "AIzaSyBJV_Nu4eUDFhOcSR271SUj9IunkS6Mh08",
+  authDomain: "game-2-ac5cc.firebaseapp.com",
+  databaseURL: "https://game-2-ac5cc-default-rtdb.firebaseio.com",
+  projectId: "game-2-ac5cc"
+};
+firebase.initializeApp(FB);
+const db = firebase.database();
 
-const sN=localStorage.getItem('xo_name');
-if(sN){
-  document.getElementById('uName').value=sN;
-  myName=sN;nameOk=true;
-  const _btn=document.getElementById('confirmBtn');
-  const _st=document.getElementById('nameStatus');
-  const _ic=document.getElementById('nameIcon');
-  const _chg=document.getElementById('xoChangeBtn');
-  const _badge=document.getElementById('xoSavedBadge');
-  if(_btn){_btn.disabled=false;_btn.style.opacity='1';_btn.style.cursor='pointer';}
-  if(_st){_st.textContent='✅ مرحباً مجدداً '+sN+'!';_st.style.color='#00ff88';}
-  if(_ic)_ic.textContent='✅';
-  if(_chg)_chg.style.display='block';
-  if(_badge)_badge.style.display='inline-flex';
-  // تحقق خلفي — يُعيد التحقق من الاسم مع Firebase
-  // تحقق سريع — مع fallback فوري
-  checkName(sN);
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const myId = (() => {
+  let id = localStorage.getItem('xo_id');
+  if (!id) { id = 'xo_' + Math.random().toString(36).substr(2,8); localStorage.setItem('xo_id', id); }
+  return id;
+})();
+const AVTS = ['🥷','🧙','⚔️','🛡️','🏹','⚡','🦊','🐉','💣','🔱'];
+const myAv = (() => {
+  let a = localStorage.getItem('xo_av');
+  if (!a) { a = AVTS[Math.floor(Math.random()*AVTS.length)]; localStorage.setItem('xo_av', a); }
+  return a;
+})();
+const BOT_ID = 'XO_BOT_MEDIUM';
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const PCOLS = ['#00d4ff','#ff6b6b','#ffd700','#00ff88','#ff8c00','#c77dff','#ff4da6','#7bed9f','#f4a261','#06d6a0','#ef476f','#118ab2','#ffd166','#e63946','#2ec4b6','#ff9f1c','#a8dadc','#ff70a6','#70d6ff','#ffc8dd'];
+const pColMap = {};
+let pColIdx = 0;
+
+let myName = '', roomCode = '', isLeader = false, isReady = false;
+let vsAI = false, aiDiff = 'medium';
+let p1id = '', p2id = '', p1nm = '', p2nm = '', mySymbol = '';
+let board = Array(9).fill(null), curTurn = 'X', gameOn = false;
+let scores = {X:0, O:0}, roundN = 1;
+let matchId = '', iAmPlayer = false;
+let lobbyRef = null, boardRef = null;
+let autoTimer = null, rBtnFn = null;
+let players = {}; // all tournament players {id:{name,av,out,wins}}
+let musicOn = localStorage.getItem('xo_music') !== 'off';
+let audioCtx = null, masterGain = null, bgNodes = [];
+let nameTimer = null, codeTimer = null, codeOk = false, settOpen = false;
+let chatOpen = false, unread = 0;
+
+/* ══════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════ */
+function show(id) {
+  document.querySelectorAll('.scr').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
 }
-for(let i=0;i<10;i++){const d=document.createElement('div');d.className='pt';d.style.cssText=`left:${Math.random()*100}vw;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:${Math.random()>0.5?'rgba(0,212,255,0.35)':'rgba(255,50,85,0.3)'};animation-duration:${5+Math.random()*7}s;animation-delay:-${Math.random()*7}s;`;document.body.appendChild(d);}
-(function(){const p=new URLSearchParams(location.search);const jc=p.get('join')||localStorage.getItem('xo_join_code');const jn=p.get('name')||localStorage.getItem('xo_join_name');localStorage.removeItem('xo_join_code');localStorage.removeItem('xo_join_name');if(jc){setTimeout(()=>{if(jn){myName=jn;document.getElementById('uName').value=jn;}document.getElementById('rCode').value=jc;const n=document.getElementById('uName').value.trim();if(!n)return;myName=n;localStorage.setItem('xo_name',n);db.ref(`xo/${jc}`).once('value',s=>{if(!s.exists()){showErr('❌ الغرفة غير موجودة!');return;}if(s.val().started){showErr('⚠️ البطولة بدأت!');return;}roomCode=jc;isLeader=false;enterLobby();});},400);}})();
-function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
-function showErr(m){const e=document.getElementById('errBox')||document.getElementById('partyErrBox');if(!e)return;e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
-/* ── Name availability ── */
-function checkName(val){
-  const name=val.trim();
-  const statusEl=document.getElementById('nameStatus');
-  const iconEl=document.getElementById('nameIcon');
-  const btn=document.getElementById('confirmBtn');
-  nameOk=false;
-  btn.disabled=true;btn.style.opacity='0.4';btn.style.cursor='not-allowed';
-  iconEl.textContent='';statusEl.textContent='';
+function showErr(boxId, msg) {
+  const e = document.getElementById(boxId);
+  if (!e) return;
+  e.textContent = msg; e.style.display = 'block';
+  clearTimeout(e._t); e._t = setTimeout(() => e.style.display = 'none', 3000);
+}
+function goBack() {
+  cleanup();
+  window.location.href = 'index.html';
+}
+function cleanup() {
+  if (lobbyRef) { lobbyRef.off(); lobbyRef = null; }
+  if (boardRef) { boardRef.off(); boardRef = null; }
+  if (roomCode) db.ref(`xo2/${roomCode}/players/${myId}`).remove();
+  roomCode = ''; vsAI = false; gameOn = false;
+}
+function getPCol(name) {
+  if (!pColMap[name]) { pColMap[name] = PCOLS[pColIdx % PCOLS.length]; pColIdx++; }
+  return pColMap[name];
+}
+// Particles
+for (let i = 0; i < 10; i++) {
+  const d = document.createElement('div'); d.className = 'pt';
+  d.style.cssText = `left:${Math.random()*100}vw;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:${Math.random()>.5?'rgba(0,212,255,.35)':'rgba(255,50,85,.3)'};animation-duration:${5+Math.random()*7}s;animation-delay:-${Math.random()*7}s;`;
+  document.body.appendChild(d);
+}
 
-  if(!name||name.length<2){
-    if(name.length===1){
-      statusEl.textContent='الاسم قصير جداً — حرفان على الأقل';
-      statusEl.style.color='rgba(255,255,255,0.35)';
-    }
+/* ══════════════════════════════════════════
+   CONNECTION DOT
+══════════════════════════════════════════ */
+db.ref('.info/connected').on('value', s => {
+  const dot = document.getElementById('connDot');
+  const txt = document.getElementById('connTxt');
+  if (s.val()) {
+    if (dot) dot.style.background = '#00ff88';
+    if (txt) txt.textContent = 'متصل';
+    const inp = document.getElementById('uName');
+    if (inp && inp.value.trim().length >= 2) onNameInput(inp.value.trim());
+  } else {
+    if (dot) dot.style.background = '#ff5566';
+    if (txt) txt.textContent = 'غير متصل';
+  }
+});
+
+/* ══════════════════════════════════════════
+   AUTO-JOIN FROM URL
+══════════════════════════════════════════ */
+(function() {
+  const p = new URLSearchParams(location.search);
+  const jc = p.get('join') || localStorage.getItem('xo_join_code');
+  const jn = p.get('name') || localStorage.getItem('xo_join_name');
+  localStorage.removeItem('xo_join_code'); localStorage.removeItem('xo_join_name');
+  if (jc) {
+    setTimeout(() => {
+      if (jn) { myName = jn; document.getElementById('uName').value = jn; }
+      document.getElementById('rCode').value = jc;
+      const n = document.getElementById('uName').value.trim();
+      if (!n) return;
+      myName = n; localStorage.setItem('xo_name', n);
+      db.ref(`xo2/${jc}`).once('value', s => {
+        if (!s.exists()) { showErr('loginErr', '❌ الغرفة غير موجودة!'); return; }
+        if (s.val().started) { showErr('loginErr', '⚠️ البطولة بدأت!'); return; }
+        roomCode = jc; isLeader = false; enterLobby();
+      });
+    }, 500);
+  }
+})();
+
+/* ══════════════════════════════════════════
+   AUTO-FILL SAVED NAME
+══════════════════════════════════════════ */
+const sN = localStorage.getItem('xo_name');
+if (sN) {
+  myName = sN;
+  document.getElementById('uName').value = sN;
+  document.getElementById('savedBadge').style.display = 'inline-flex';
+  document.getElementById('changeBtn').style.display = 'block';
+  document.getElementById('nameSt').textContent = '✅ مرحباً مجدداً ' + sN + '!';
+  document.getElementById('nameSt').style.color = '#00ff88';
+  document.getElementById('nameIcon').textContent = '✅';
+  const btn = document.getElementById('enterBtn');
+  btn.disabled = false;
+  setTimeout(() => onNameInput(sN), 800);
+}
+
+/* ══════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════ */
+document.getElementById('uName').addEventListener('keydown', e => { if (e.key === 'Enter') goToParty(); });
+document.getElementById('rCode').addEventListener('keydown', e => { if (e.key === 'Enter' && codeOk) joinRoom(); });
+document.getElementById('chatInp').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+function onNameInput(val) {
+  const name = val.trim();
+  const st = document.getElementById('nameSt');
+  const ic = document.getElementById('nameIcon');
+  const btn = document.getElementById('enterBtn');
+  ic.textContent = ''; st.textContent = '';
+  if (!name || name.length < 2) {
+    btn.disabled = true;
+    if (name.length === 1) { st.textContent = 'الاسم قصير جداً'; st.style.color = 'rgba(255,255,255,.35)'; }
     return;
   }
-  // فعّل الزر فوراً (ثم تحقق من Firebase في الخلفية)
-  nameOk=true;
-  statusEl.textContent='✅ الاسم متاح!';
-  statusEl.style.color='#00ff88'; iconEl.textContent='✅';
-  btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
+  // Enable immediately
+  btn.disabled = false;
+  st.textContent = '✅ الاسم متاح!'; st.style.color = '#00ff88'; ic.textContent = '✅';
+  // Background check
   clearTimeout(nameTimer);
-  nameTimer=setTimeout(()=>{
-    const key=name.toLowerCase().split(' ').join('_');
-    // مؤقت fallback: إذا لم يرد Firebase خلال 1.5 ثانية — اسمح بالمتابعة
-    const fallback=setTimeout(()=>{
-      if(!nameOk){
-        nameOk=true;
-        statusEl.textContent='✅ الاسم متاح!';
-        statusEl.style.color='#00ff88'; iconEl.textContent='✅';
-        btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
-      }
-    },1500);
-    try{
-      db.ref('playerNames/'+key).once('value')
-        .then(snap=>{
-          clearTimeout(fallback);
-          if(snap.exists()&&snap.val()?.id&&snap.val().id!==myId){
-            nameOk=false;
-            statusEl.textContent='❌ هذا الاسم محجوز — جرب اسماً آخر';
-            statusEl.style.color='#ff5566'; iconEl.textContent='❌';
-            btn.disabled=true;btn.style.opacity='0.4';btn.style.cursor='not-allowed';
-          } else {
-            clearTimeout(fallback);
-            nameOk=true;
-            statusEl.textContent='✅ الاسم متاح!';
-            statusEl.style.color='#00ff88'; iconEl.textContent='✅';
-            btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
-          }
-        })
-        .catch(()=>{
-          clearTimeout(fallback);
-          nameOk=true;
-          statusEl.textContent='✅ الاسم متاح!';
-          statusEl.style.color='#00ff88'; iconEl.textContent='✅';
-          btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
-        });
-    }catch(e){
-      clearTimeout(fallback);
-      nameOk=true;
-      statusEl.textContent='✅ الاسم متاح!';
-      statusEl.style.color='#00ff88'; iconEl.textContent='✅';
-      btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
-    }
-  },400);
+  const fb = setTimeout(() => {/* fallback already enabled */}, 1500);
+  nameTimer = setTimeout(() => {
+    const key = name.toLowerCase().replace(/\s+/g, '_');
+    db.ref('playerNames/' + key).once('value')
+      .then(snap => {
+        clearTimeout(fb);
+        if (snap.exists() && snap.val()?.id && snap.val().id !== myId) {
+          btn.disabled = true;
+          st.textContent = '❌ الاسم محجوز'; st.style.color = '#ff5566'; ic.textContent = '❌';
+        }
+      })
+      .catch(() => clearTimeout(fb));
+  }, 500);
 }
 
-function xoChangeName(){
-  myName='';nameOk=false;
-  const inp=document.getElementById('uName');
-  const btn=document.getElementById('confirmBtn');
-  const st=document.getElementById('nameStatus');
-  const ic=document.getElementById('nameIcon');
-  const chg=document.getElementById('xoChangeBtn');
-  const badge=document.getElementById('xoSavedBadge');
-  if(inp){inp.value='';inp.disabled=false;inp.focus();}
-  if(btn){btn.disabled=true;btn.style.opacity='0.4';btn.style.cursor='not-allowed';}
-  if(st)st.textContent='';if(ic)ic.textContent='';
-  if(chg)chg.style.display='none';if(badge)badge.style.display='none';
+function changeName() {
+  myName = '';
+  document.getElementById('uName').value = '';
+  document.getElementById('uName').disabled = false;
+  document.getElementById('uName').focus();
+  document.getElementById('enterBtn').disabled = true;
+  document.getElementById('nameSt').textContent = '';
+  document.getElementById('nameIcon').textContent = '';
+  document.getElementById('changeBtn').style.display = 'none';
+  document.getElementById('savedBadge').style.display = 'none';
   localStorage.removeItem('xo_name');
 }
 
-function goToParty(){
-  const name=document.getElementById('uName').value.trim();
-  if(!name){showErr('⚠️ أدخل اسمك!');return;}
-  if(!nameOk){showErr('⚠️ تحقق من الاسم أولاً!');return;}
-  myName=name;localStorage.setItem('xo_name',name);
-  // Reserve name in Firebase
-  const key=myName.toLowerCase().split(' ').join('_');
-  db.ref('playerNames/'+key).set({id:myId,ts:Date.now()}).catch(()=>{});
-  db.ref('playerNames/'+key).onDisconnect().remove();
-  // Play sound
-  initXOAudio();sfxConfirm();
+function goToParty() {
+  const name = document.getElementById('uName').value.trim();
+  if (!name || name.length < 2) { showErr('loginErr', '⚠️ أدخل اسمك!'); return; }
+  myName = name; localStorage.setItem('xo_name', name);
+  // Reserve name
+  const key = name.toLowerCase().replace(/\s+/g, '_');
+  db.ref('playerNames/' + key).set({ id: myId, ts: Date.now() }).catch(() => {});
+  db.ref('playerNames/' + key).onDisconnect().remove();
   // Show party screen
-  document.getElementById('partyHiName').textContent=myName;
-  document.getElementById('partyAvatar').textContent=myAv;
-  document.getElementById('rCode').value='';
-  document.getElementById('codeStatus').textContent='';
-  document.getElementById('codeIcon').textContent='';
-  codeOk=false;
-  const jb=document.getElementById('joinBtn');jb.disabled=true;jb.style.opacity='0.4';jb.style.cursor='not-allowed';
-  show('scrParty');
+  document.getElementById('partyName').textContent = myName;
+  document.getElementById('partyAv').textContent = myAv;
+  document.getElementById('rCode').value = '';
+  document.getElementById('codeSt').textContent = '';
+  document.getElementById('codeIcon').textContent = '';
+  codeOk = false;
+  document.getElementById('joinBtn').disabled = true;
+  sfxClick();
+  show('scnParty');
 }
 
-/* ── Code check ── */
-function checkCode(val){
-  const code=val.trim().toUpperCase();
-  const st=document.getElementById('codeStatus');
-  const ic=document.getElementById('codeIcon');
-  const btn=document.getElementById('joinBtn');
-  codeOk=false;btn.disabled=true;btn.style.opacity='0.4';btn.style.cursor='not-allowed';
-  ic.textContent='';st.textContent='';
-  if(code.length<4){return;}
-  st.textContent='⏳ جاري البحث...';st.style.color='rgba(255,255,255,0.4)';ic.textContent='⏳';
+/* ══════════════════════════════════════════
+   CODE CHECK
+══════════════════════════════════════════ */
+function onCodeInput(val) {
+  const code = val.trim().toUpperCase();
+  const st = document.getElementById('codeSt');
+  const ic = document.getElementById('codeIcon');
+  const btn = document.getElementById('joinBtn');
+  codeOk = false; btn.disabled = true;
+  ic.textContent = ''; st.textContent = '';
+  if (code.length < 4) return;
+  st.textContent = '⏳ جاري البحث...'; st.style.color = 'rgba(255,255,255,.4)'; ic.textContent = '⏳';
   clearTimeout(codeTimer);
-  codeTimer=setTimeout(()=>{
-    db.ref(`xo/${code}`).once('value',snap=>{
-      if(snap.exists()&&!snap.val().started){
-        const cnt=Object.keys(snap.val().players||{}).length;
-        const roomData=snap.val();
-        const realCnt=Object.keys(roomData.players||{}).filter(id=>id!==BOT_ID).length;
-        if(roomData.locked||realCnt>=20){
-          codeOk=false;
-          st.textContent='🔒 الغرفة مقفلة ومملوءة — 20/20';
-          st.style.color='#ff5566';ic.textContent='🔒';
-          btn.disabled=true;btn.style.opacity='0.4';btn.style.cursor='not-allowed';
+  codeTimer = setTimeout(() => {
+    db.ref(`xo2/${code}`).once('value', snap => {
+      if (snap.exists() && !snap.val().started) {
+        const cnt = Object.keys(snap.val().players || {}).filter(id => id !== BOT_ID).length;
+        if (snap.val().locked) {
+          codeOk = false; st.textContent = '🔒 الغرفة مقفلة — 20/20'; st.style.color = '#ff5566'; ic.textContent = '🔒';
         } else {
-          codeOk=true;
-          st.textContent='✅ البارتي موجود — '+realCnt+'/20 لاعب';
-          st.style.color='#00ff88';ic.textContent='✅';
-          btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
+          codeOk = true; st.textContent = `✅ البارتي موجود — ${cnt}/20 لاعب`; st.style.color = '#00ff88'; ic.textContent = '✅';
+          btn.disabled = false;
         }
-      } else if(snap.exists()&&snap.val().started){
-        codeOk=false;st.textContent='⚠️ البطولة بدأت بالفعل!';st.style.color='#ffaa00';ic.textContent='⚠️';
+      } else if (snap.exists() && snap.val().started) {
+        st.textContent = '⚠️ البطولة بدأت!'; st.style.color = '#ffaa00'; ic.textContent = '⚠️';
       } else {
-        codeOk=false;st.textContent='❌ الكود غير موجود';st.style.color='#ff5566';ic.textContent='❌';
+        st.textContent = '❌ الكود غير موجود'; st.style.color = '#ff5566'; ic.textContent = '❌';
       }
     });
-  },400);
+  }, 400);
 }
 
-function getN(){const n=document.getElementById('uName')?.value?.trim()||myName;if(!n){showPartyErr('⚠️ أدخل اسمك!');return null;}myName=n;localStorage.setItem('xo_name',n);return n;}
-function showPartyErr(m){const e=document.getElementById('partyErrBox');if(!e)return;e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
-/* ══ XO CHAT ══ */
-let xoChatOpen=false, xoUnread=0;
-const xoPlayerColors=['#00d4ff','#ff6b6b','#ffd700','#00ff88','#ff8c00','#c77dff','#ff4da6','#7bed9f','#70d6ff','#f4a261','#06d6a0','#ef476f'];
-const xoColorMap={};let xoColorIdx=0;
-function getXOColor(name){if(!xoColorMap[name]){xoColorMap[name]=xoPlayerColors[xoColorIdx%xoPlayerColors.length];xoColorIdx++;}return xoColorMap[name];}
+/* ══════════════════════════════════════════
+   ROOM CREATE / JOIN
+══════════════════════════════════════════ */
+function createRoom() {
+  roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+  isLeader = true; sfxClick();
+  enterLobby();
+}
+function joinRoom() {
+  if (!codeOk) return;
+  const code = document.getElementById('rCode').value.trim().toUpperCase();
+  db.ref(`xo2/${code}`).once('value', s => {
+    if (!s.exists()) { showErr('partyErr', '❌ الغرفة غير موجودة!'); return; }
+    if (s.val().started) { showErr('partyErr', '⚠️ البطولة بدأت!'); return; }
+    if (s.val().locked) { showErr('partyErr', '🔒 الغرفة مقفلة!'); return; }
+    const cnt = Object.keys(s.val().players || {}).filter(id => id !== BOT_ID).length;
+    if (cnt >= 20) { showErr('partyErr', '🚫 الغرفة ممتلئة!'); return; }
+    roomCode = code; isLeader = false; sfxClick();
+    enterLobby();
+  });
+}
 
-function openXOChat(){
-  xoChatOpen=true;xoUnread=0;
-  const dot=document.getElementById('xoNotifDot');if(dot)dot.style.display='none';
-  document.getElementById('xoChatPopup').style.display='flex';
-  document.getElementById('xoChatBackdrop').style.display='block';
-  const log=document.getElementById('xoChatLog');
-  if(log) requestAnimationFrame(()=>log.scrollTop=log.scrollHeight);
-  setTimeout(()=>document.getElementById('chatInp')?.focus(),250);
+/* ══════════════════════════════════════════
+   LOBBY
+══════════════════════════════════════════ */
+function enterLobby() {
+  show('scnLobby');
+  document.getElementById('dispCode').textContent = roomCode;
+  db.ref(`xo2/${roomCode}/players/${myId}`).set({ name: myName, av: myAv, ready: false });
+  db.ref(`xo2/${roomCode}/players/${myId}`).onDisconnect().remove();
+  if (isLeader) db.ref(`xo2/${roomCode}/leader`).set(myId);
+  if (musicOn) startMusic();
+  listenLobby();
 }
-function closeXOChat(){
-  xoChatOpen=false;
-  document.getElementById('xoChatPopup').style.display='none';
-  document.getElementById('xoChatBackdrop').style.display='none';
+
+function listenLobby() {
+  if (lobbyRef) lobbyRef.off();
+  lobbyRef = db.ref(`xo2/${roomCode}`);
+  lobbyRef.on('value', snap => {
+    const data = snap.val(); if (!data) return;
+    const pl = data.players || {};
+    const lid = data.leader;
+    const pids = Object.keys(pl);
+    const realPids = pids.filter(id => id !== BOT_ID);
+    const realCount = realPids.length;
+    const botExists = !!pl[BOT_ID];
+    const rdyCount = pids.filter(id => pl[id].ready || id === BOT_ID || id === lid).length;
+
+    document.getElementById('rdyC').textContent = rdyCount;
+    document.getElementById('totC').textContent = pids.length;
+
+    // Render players
+    document.getElementById('pList').innerHTML = pids.map(id => {
+      const p = pl[id]; const isL = id === lid; const isBot = p.isBot;
+      return `<div class="pcard ${(p.ready || isL || isBot) ? 'ready' : ''}">
+        ${isL ? `<div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:.85rem;">👑</div>` : ''}
+        <div class="pav">${p.av || '🥷'}</div>
+        <div class="pnm">${p.name}</div>
+        ${isBot ? `<div style="font-size:.5rem;color:var(--gold);">بوت</div>` : ''}
+      </div>`;
+    }).join('');
+
+    // Bot management (leader only)
+    if (myId === lid && !data.started) {
+      if (realCount >= 3 && realCount % 2 !== 0 && !botExists) {
+        db.ref(`xo2/${roomCode}/players/${BOT_ID}`).set({ name: '🤖 بوت', av: '🤖', ready: true, isBot: true });
+      } else if ((realCount % 2 === 0 || realCount < 3) && botExists) {
+        db.ref(`xo2/${roomCode}/players/${BOT_ID}`).remove();
+      }
+      // Room lock
+      if (realCount >= 20 && !data.locked) db.ref(`xo2/${roomCode}/locked`).set(true);
+      else if (realCount < 20 && data.locked) db.ref(`xo2/${roomCode}/locked`).remove();
+    }
+
+    // Start button
+    const sb = document.getElementById('startBtn');
+    const wm = document.getElementById('waitMsg');
+    if (myId === lid) {
+      wm.style.display = 'none';
+      sb.style.display = 'flex';
+      if (realCount < 2) {
+        sb.disabled = true; sb.textContent = 'انتظر لاعباً آخر...';
+      } else {
+        const notRdy = realPids.filter(id => id !== lid && !pl[id].ready).length;
+        if (notRdy > 0) {
+          sb.disabled = true; sb.textContent = `⏳ ${notRdy} لم يجهزوا`;
+        } else {
+          sb.disabled = false; sb.textContent = `⚔️ ابدأ (${pids.length} لاعبين)`;
+        }
+      }
+    } else {
+      sb.style.display = 'none'; wm.style.display = 'block';
+    }
+
+    // Tournament started
+    if (data.started) {
+      if (lobbyRef) { lobbyRef.off(); lobbyRef = null; }
+      initTourn(data);
+    }
+    if (!pl[myId] && roomCode) show('scnParty');
+  });
+
+  // Chat
+  db.ref(`xo2/${roomCode}/chat`).limitToLast(20).on('child_added', snap => {
+    const m = snap.val(); if (m) appendMsg(m);
+  });
 }
-function appendChatMsg(m){
-  const isMe=(m.u===myName);
-  const color=getXOColor(m.u);
-  const log=document.getElementById('xoChatLog');
-  const d=document.createElement('div');
-  d.className='xo-chat-row';
-  d.style.justifyContent=isMe?'flex-end':'flex-start';
-  d.innerHTML=`<div class="xo-chat-bubble ${isMe?'me':'them'}">
-    <div class="xo-chat-name" style="color:${color}">${m.u}</div>
-    <div class="xo-chat-text">${m.t}</div>
-  </div>`;
-  if(log){log.appendChild(d);requestAnimationFrame(()=>log.scrollTop=log.scrollHeight);}
-  // Notif dot if chat closed
-  if(!xoChatOpen){
-    xoUnread++;
-    const dot=document.getElementById('xoNotifDot');if(dot)dot.style.display='block';
+
+function toggleReady() {
+  isReady = !isReady;
+  db.ref(`xo2/${roomCode}/players/${myId}/ready`).set(isReady);
+  document.getElementById('rdyBtn').textContent = isReady ? '✓ جاهز!' : '✓ جاهز';
+  document.getElementById('rdyBtn').style.opacity = isReady ? '0.6' : '1';
+  sfxClick();
+}
+
+function leaveRoom() {
+  cleanup(); isReady = false; show('scnParty');
+}
+
+/* ══════════════════════════════════════════
+   TOURNAMENT START
+══════════════════════════════════════════ */
+function startTournament() {
+  db.ref(`xo2/${roomCode}/players`).once('value', snap => {
+    const pl = snap.val() || {};
+    const pids = Object.keys(pl);
+    if (pids.length < 2) return;
+    const shuffled = [...pids].sort(() => Math.random() - .5);
+    // Write /myMatch/ pairs
+    const writes = [];
+    for (let i = 0; i < shuffled.length; i += 2) {
+      const a = shuffled[i], b = shuffled[i+1];
+      if (!b) continue;
+      writes.push(db.ref(`xo2/${roomCode}/myMatch/${a}`).set(b));
+      writes.push(db.ref(`xo2/${roomCode}/myMatch/${b}`).set(a));
+    }
+    writes.push(db.ref(`xo2/${roomCode}/tournPlayers`).set(shuffled));
+    Promise.all(writes).then(() => db.ref(`xo2/${roomCode}/started`).set(true));
+  });
+}
+
+/* ══════════════════════════════════════════
+   TOURNAMENT ENGINE
+══════════════════════════════════════════ */
+function initTourn(data) {
+  const pl = data.players || {};
+  const order = data.tournPlayers || Object.keys(pl);
+  players = {};
+  order.forEach(id => {
+    players[id] = {
+      id, out: false, wins: 0,
+      name: id === BOT_ID ? '🤖 بوت' : (pl[id]?.name || '?'),
+      av: id === BOT_ID ? '🤖' : (pl[id]?.av || '🥷'),
+      isBot: id === BOT_ID
+    };
+  });
+  waitForMatch();
+}
+
+function waitForMatch() {
+  show('scnTournament');
+  renderTourn('⏳ في انتظار دورك...');
+  db.ref(`xo2/${roomCode}/myMatch/${myId}`).off();
+  db.ref(`xo2/${roomCode}/myMatch/${myId}`).on('value', snap => {
+    const oppId = snap.val();
+    if (!oppId) return;
+    db.ref(`xo2/${roomCode}/myMatch/${myId}`).off();
+    beginMatch(oppId);
+  });
+}
+
+function beginMatch(oppId) {
+  iAmPlayer = true;
+  // Determine roles: lower ID = X = P1
+  const iAmP1 = myId < oppId;
+  p1id = iAmP1 ? myId : oppId;
+  p2id = iAmP1 ? oppId : myId;
+  p1nm = players[p1id]?.name || '?';
+  p2nm = players[p2id]?.name || '?';
+  mySymbol = iAmP1 ? 'X' : 'O';
+  matchId = `m_${p1id}_${p2id}`;
+  scores = {X:0, O:0}; roundN = 1;
+  buildBoard(); show('scnBattle');
+  updateBattleUI();
+  // P1 initializes the board
+  if (iAmP1) {
+    const empty = {}; for (let i = 0; i < 9; i++) empty[i] = '_';
+    db.ref(`xo2/${roomCode}/boards/${matchId}`).set({ board: empty, turn: 'X', sx: 0, so: 0, round: 1 });
+  }
+  gameOn = false;
+  setTimeout(() => { gameOn = true; listenBoard(); }, 500);
+}
+
+function listenBoard() {
+  if (boardRef) { boardRef.off(); boardRef = null; }
+  boardRef = db.ref(`xo2/${roomCode}/boards/${matchId}`);
+  boardRef.on('value', snap => {
+    const md = snap.val(); if (!md) return;
+    if (md.winner !== undefined) {
+      boardRef.off(); boardRef = null;
+      onMatchEnd(md.winner);
+      return;
+    }
+    // New round detection
+    if ((md.round || 1) !== roundN) {
+      roundN = md.round || 1;
+      scores = { X: md.sx || 0, O: md.so || 0 };
+      board = normBoard(md.board);
+      curTurn = md.turn || 'X';
+      renderBoard(); updateBattleUI();
+      gameOn = true;
+      return;
+    }
+    const nb = normBoard(md.board);
+    const nt = md.turn || 'X';
+    const chg = nb.some((v, i) => v !== board[i]) || nt !== curTurn;
+    if (!chg) return;
+    board = nb; curTurn = nt;
+    renderBoard(); updateTurnUI();
+    const mt = (curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
+    document.getElementById('myTurnMsg').textContent = mt ? '🎯 دورك!' : 'انتظر دورك...';
+    if (!gameOn) return;
+    const w = checkWin(board);
+    const filled = board.filter(v => v !== null).length;
+    if (w) { gameOn = false; boardRef.off(); boardRef = null; onRoundEnd(w); }
+    else if (filled >= 9) { gameOn = false; boardRef.off(); boardRef = null; onRoundEnd('draw'); }
+  });
+  // Bot logic
+  if ((p1id===BOT_ID||p2id===BOT_ID) && isLeader) {
+    const botSym = p1id===BOT_ID ? 'X' : 'O';
+    db.ref(`xo2/${roomCode}/boards/${matchId}`).on('value', bs => {
+      const bmd = bs.val(); if (!bmd || bmd.winner!==undefined) return;
+      if (bmd.turn === botSym) {
+        const brd = normBoard(bmd.board);
+        if (checkWin(brd) || brd.every(v => v!==null)) return;
+        setTimeout(() => {
+          const mv = botMove(brd, botSym);
+          if (mv !== -1) {
+            const nb2 = [...brd]; nb2[mv] = botSym;
+            const nt2 = botSym==='X' ? 'O' : 'X';
+            const bo = {}; nb2.forEach((v,j) => { bo[j] = v||'_'; });
+            db.ref(`xo2/${roomCode}/boards/${matchId}`).update({ board: bo, turn: nt2 });
+          }
+        }, 600 + Math.random()*500);
+      }
+    });
   }
 }
 
-function goBack(){if(lobbyRef){lobbyRef.off();lobbyRef=null;}if(matchRef){matchRef.off();matchRef=null;}if(roomCode){db.ref(`xo/${roomCode}/players/${myId}`).remove();}roomCode='';vsAI=false;window.location.href='index.html';}
-document.getElementById('uName').addEventListener('keydown',e=>{if(e.key==='Enter')goToParty();});
-document.getElementById('rCode')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&codeOk)joinRoom();});
-document.getElementById('chatInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
-function createRoom(){if(!myName){showPartyErr('⚠️ أدخل اسمك!');return;}roomCode=Math.floor(1000+Math.random()*9000).toString();isLeader=true;enterLobby();}
-function joinRoom(){
-  if(!codeOk)return;
-  if(!myName){showPartyErr('⚠️ أدخل اسمك!');return;}
-  const code=document.getElementById('rCode').value.trim().toUpperCase();
-  if(!code)return;
-  // تحقق من القفل والحد الأقصى
-  db.ref(`xo/${code}`).once('value',snap=>{
-    const data=snap.val()||{};
-    if(data.locked){showPartyErr('🔒 الغرفة ممتلئة ومقفلة — لا يمكن الانضمام!');return;}
-    const pl=data.players||{};
-    const realCount=Object.keys(pl).filter(id=>id!==BOT_ID).length;
-    if(realCount>=20){showPartyErr('🚫 الغرفة ممتلئة — 20 لاعب كحد أقصى!');return;}
-    roomCode=code;isLeader=false;enterLobby();
-  });
-}
-function openDiff(){if(!myName){showPartyErr('⚠️ أدخل اسمك!');return;}document.getElementById('diffModal').style.display='flex';}
-function closeDiff(){document.getElementById('diffModal').style.display='none';}
-function startAI(diff){closeDiff();aiDiff=diff;vsAI=true;p1id=myId;p1nm=myName;p2id='AI';p2nm='🤖 '+{easy:'سهل',medium:'متوسط',hard:'صعب'}[diff];mySymbol='X';scores={X:0,O:0};roundN=1;buildBoard();show('scrBattle');setupUI(p1nm,p2nm);startRoundAI();}
-function enterLobby(){show('scrLobby');document.getElementById('dispCode').textContent=roomCode;db.ref(`xo/${roomCode}/players/${myId}`).set({name:myName,av:myAv,ready:false});db.ref(`xo/${roomCode}/players/${myId}`).onDisconnect().remove();if(isLeader)db.ref(`xo/${roomCode}/leader`).set(myId);listenLobby();}
-function listenLobby(){
-  if(lobbyRef)lobbyRef.off();
-  lobbyRef=db.ref(`xo/${roomCode}`);
-  lobbyRef.on('value',snap=>{
-    const data=snap.val();if(!data)return;
-    const pl=data.players||{};const lid=data.leader;const pids=Object.keys(pl);
-    // ── إدارة البوت تلقائياً (الليدر فقط) ──
-    if(myId===lid&&!data.started){
-      const realCount=pids.filter(id=>id!==BOT_ID).length;
-      const botExists=!!pl[BOT_ID];
-      // إدارة البوت
-      if(realCount>=3&&realCount%2!==0&&!botExists){
-        db.ref(`xo/${roomCode}/players/${BOT_ID}`).set({name:'🤖 بوت',av:'🤖',ready:true,isBot:true});
-      } else if((realCount%2===0||realCount<3)&&botExists){
-        db.ref(`xo/${roomCode}/players/${BOT_ID}`).remove();
-      }
-      // قفل/فتح الغرفة عند الوصول لـ 20
-      if(realCount>=20&&!data.locked){
-        db.ref(`xo/${roomCode}/locked`).set(true);
-      } else if(realCount<20&&data.locked){
-        db.ref(`xo/${roomCode}/locked`).remove();
-      }
-    }
-    const rdy=pids.filter(id=>id===BOT_ID||pl[id].ready).length;
-    const realPids=pids.filter(id=>id!==BOT_ID);
-    document.getElementById('rdyC').textContent=rdy;
-    document.getElementById('totC').textContent=pids.length;
-    document.getElementById('pList').innerHTML=pids.map(id=>{
-  const p=pl[id];const isL=(id===lid);const isBot=p.isBot;
-  return `<div class="pcard ready" style="${isBot?'border-color:rgba(255,200,0,0.4);':''}">
-    <div class="pav">${p.av||'🥷'}</div>
-    <div class="pnm">${isL?'👑 ':''}${p.name}</div>
-    ${isBot?'<div style="font-size:0.5rem;color:var(--gold);margin-top:2px;">متوسط</div>':''}
-  </div>`;
-}).join('');
-    const sb=document.getElementById('startBtn');const wm=document.getElementById('waitMsg');
-    if(myId===lid){wm.style.display='none';const realP=pids.filter(id=>id!==BOT_ID).length;
-      const botP=pids.includes(BOT_ID)?1:0;
-      if(realP<2){
-        sb.style.display='flex';sb.disabled=true;sb.style.opacity='0.4';
-        sb.textContent='انتظر لاعباً آخر...';
-      } else {
-        const nr=pids.filter(id=>id!==lid&&id!==BOT_ID&&!pl[id].ready).length;
-        sb.style.display='flex';
-        if(nr>0){
-          sb.disabled=true;sb.style.opacity='0.45';
-          sb.textContent='⏳ '+nr+' لم يجهزوا';
-        } else {
-          sb.disabled=false;sb.style.opacity='1';
-          const botTxt=botP?' +🤖':'';
-          sb.textContent='⚔️ ابدأ ('+realP+botTxt+' لاعبين)';
-        }
-      }
-    }else{sb.style.display='none';wm.style.display='block';}
-    if(data.started){ lobbyRef.off();lobbyRef=null; initTourn(data); }
-    if(!pl[myId]&&roomCode){show('scrLogin');}
-  });
-  db.ref(`xo/${roomCode}/chat`).limitToLast(20).on('child_added',snap=>{const m=snap.val();if(m)appendChatMsg(m);});
-}
-function toggleReady(){isReady=!isReady;db.ref(`xo/${roomCode}/players/${myId}/ready`).set(isReady);const b=document.getElementById('rdyBtn');b.textContent=isReady?'✓ جاهز!':'✓ جاهز';b.style.opacity=isReady?'0.6':'1';}
-const BOT_ID='BOT_AI_MEDIUM';
-function requestStart(){
-  db.ref(`xo/${roomCode}/players`).once('value',snap=>{
-    const pl=snap.val()||{};
-    let pids=Object.keys(pl);
-    if(pids.length<2) return;
-    const shuffled=[...pids].sort(()=>Math.random()-0.5);
-    db.ref(`xo/${roomCode}/tournamentPlayers`).set(shuffled);
-    // كتابة أزواج المباريات في /myMatch/
-    const writes=[];
-    for(let i=0;i<shuffled.length;i+=2){
-      const a=shuffled[i], b=shuffled[i+1];
-      if(!b) continue;
-      writes.push(db.ref(`xo/${roomCode}/myMatch/${a}`).set(b));
-      writes.push(db.ref(`xo/${roomCode}/myMatch/${b}`).set(a));
-    }
-    Promise.all(writes).then(()=>{
-      db.ref(`xo/${roomCode}/started`).set(true);
-    });
-  });
-}
-function leaveRoom(){if(lobbyRef){lobbyRef.off();lobbyRef=null;}db.ref(`xo/${roomCode}/players/${myId}`).remove();roomCode='';isReady=false;show('scrLogin');}
-function sendChat(){
-  const i=document.getElementById('chatInp');
-  const txt=i.value.trim();
-  if(!txt||!roomCode||!myName)return;
-  db.ref(`xo/${roomCode}/chat`).push({u:myName,t:txt,ts:Date.now()});
-  i.value='';
-  const log=document.getElementById('xoChatLog');
-  if(log) requestAnimationFrame(()=>log.scrollTop=log.scrollHeight);
-}
-/* ══ TOURNAMENT ENGINE (SIMPLE) ══ */
-// الفكرة: الليدر يخزن قائمة matches في Firebase
-// كل لاعب يستمع لـ /myMatch/{myId} ليعرف خصمه
-
-function initTourn(data){
-  const pl=data.players||{};
-  const order=data.tournamentPlayers||Object.keys(pl);
-  tourn.players=order.map(id=>({
-    id,
-    name:id===BOT_ID?'🤖 بوت':(pl[id]?.name||'?'),
-    av:id===BOT_ID?'🤖':(pl[id]?.av||'🥷'),
-    out:false, wins:0, isBot:id===BOT_ID
-  }));
-  // انتظر مباراتك
-  waitForMyMatch();
-}
-
-function waitForMyMatch(){
-  show('scrTournament');
-  renderTourn('⏳ في انتظار دورك...');
-  // استمع لـ /myMatch/{myId}
-  db.ref(`xo/${roomCode}/myMatch/${myId}`).on('value', snap=>{
-    const opponentId = snap.val();
-    if(!opponentId) return;
-    db.ref(`xo/${roomCode}/myMatch/${myId}`).off();
-    // ابدأ المباراة ضد هذا الخصم
-    const iAmP1 = myId < opponentId; // P1 = أصغر ID
-    p1id = iAmP1 ? myId : opponentId;
-    p2id = iAmP1 ? opponentId : myId;
-    p1nm = tourn.players.find(p=>p.id===p1id)?.name||'?';
-    p2nm = tourn.players.find(p=>p.id===p2id)?.name||'?';
-    xoIAm = true;
-    mySymbol = iAmP1 ? 'X' : 'O';
-    currentMatchId = `match_${p1id}_${p2id}`;
-    scores={X:0,O:0}; roundN=1;
-    buildBoard(); show('scrBattle'); setupUI(p1nm,p2nm);
-    // اكتب البورد الفارغ (P1 فقط)
-    if(iAmP1){
-      const empty={};for(let i=0;i<9;i++)empty[i]='_';
-      db.ref(`xo/${roomCode}/boards/${currentMatchId}`).set({
-        board:empty, turn:'X', sx:0, so:0, round:1
-      });
-    }
-    gameOn=false;
-    setTimeout(()=>{ gameOn=true; listenMatchBoard(); }, 500);
+/* ══════════════════════════════════════════
+   BOARD
+══════════════════════════════════════════ */
+function normBoard(raw) {
+  return Array(9).fill(null).map((_, i) => {
+    const v = raw && raw[i]; return (v && v !== '_') ? v : null;
   });
 }
 
-function listenMatchBoard(){
-  if(matchRef){ matchRef.off(); matchRef=null; }
-  matchRef = db.ref(`xo/${roomCode}/boards/${currentMatchId}`);
-  matchRef.on('value', snap=>{
-    const md=snap.val(); if(!md) return;
-    // نتيجة نهائية
-    if(md.winner!==undefined){
-      matchRef.off(); matchRef=null;
-      onTournMatchDone(md.winner);
-      return;
-    }
-    // تحديث البورد
-    const raw=md.board;
-    const nb=Array(9).fill(null).map((_,i)=>{
-      const v=raw&&raw[i]; return(v&&v!=='_')?v:null;
-    });
-    const changed=nb.some((v,i)=>v!==board[i]) || md.turn!==curTurn || (md.round||1)!==roundN;
-    if(!changed) return;
-    // جولة جديدة؟
-    if((md.round||1) !== roundN){
-      roundN=md.round||1;
-      scores={X:md.sx||0, O:md.so||0};
-      board=nb; curTurn=md.turn||'X';
-      document.getElementById('scX').textContent=scores.X;
-      document.getElementById('scO').textContent=scores.O;
-      document.getElementById('rnInfo').textContent='جولة '+roundN;
-      renderBoard(); updateTurnUI();
-      gameOn=true;
-      const mt=(curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
-      document.getElementById('myTurnMsg').textContent=mt?'🎯 دورك!':'انتظر دورك...';
-      return;
-    }
-    board=nb; curTurn=md.turn||'X';
-    renderBoard(); updateTurnUI();
-    const myTurn=(curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
-    document.getElementById('myTurnMsg').textContent=myTurn?'🎯 دورك!':'انتظر دورك...';
-    if(!gameOn) return;
-    const w=checkWin(board);
-    const filled=board.filter(v=>v!==null).length;
-    if(w){ gameOn=false; matchRef.off(); matchRef=null; onTournRoundEnd(w); }
-    else if(filled>=9){ gameOn=false; matchRef.off(); matchRef=null; onTournRoundEnd('draw'); }
-  });
+function buildBoard() {
+  const b = document.getElementById('board');
+  b.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const c = document.createElement('div');
+    c.className = 'cell';
+    let touched = false;
+    c.addEventListener('touchend', e => {
+      e.preventDefault(); touched = true;
+      cellClick(i); setTimeout(() => touched = false, 300);
+    }, { passive: false });
+    c.addEventListener('click', () => { if (!touched) cellClick(i); });
+    b.appendChild(c);
+  }
 }
 
-function onTournRoundEnd(w){
-  initXOAudio(); clearTimeout(autoNextTimer);
-  if(w==='draw'){
+function renderBoard() {
+  document.querySelectorAll('.cell').forEach((c, i) => {
+    const v = board[i];
+    c.textContent = v || '';
+    c.className = 'cell';
+    if (v) c.classList.add('taken', v==='X'?'cx':'co');
+  });
+  const wl = getWinLine(board);
+  if (wl) wl.forEach(i => document.querySelectorAll('.cell')[i].classList.add('win'));
+}
+
+function cellClick(i) {
+  if (vsAI) { aiCellClick(i); return; }
+  if (!iAmPlayer || !matchId) return;
+  if (!gameOn || board[i]) return;
+  const mt = (curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
+  if (!mt) return;
+  initAudio(); curTurn==='X' ? sfxX() : sfxO();
+  gameOn = false;
+  const nb = [...board]; nb[i] = curTurn;
+  const nt = curTurn==='X' ? 'O' : 'X';
+  const bo = {}; nb.forEach((v,j) => { bo[j] = v || '_'; });
+  db.ref(`xo2/${roomCode}/boards/${matchId}`).update({ board: bo, turn: nt })
+    .then(() => { gameOn = true; }).catch(() => { gameOn = true; });
+}
+
+function checkWin(b) {
+  for (const [a,p,q] of WINS) { const v=b[a]; if(v&&v===b[p]&&v===b[q]) return v; }
+  return null;
+}
+function getWinLine(b) {
+  for (const l of WINS) { const v=b[l[0]]; if(v&&v===b[l[1]]&&v===b[l[2]]) return l; }
+  return null;
+}
+
+/* ══════════════════════════════════════════
+   ROUND / MATCH LOGIC
+══════════════════════════════════════════ */
+function onRoundEnd(w) {
+  initAudio(); clearTimeout(autoTimer);
+  if (w === 'draw') {
     sfxDraw();
-    showRes('🤝','تعادل!','جولة تالية خلال 4 ثوانٍ...');
-    setResBtn('التالي الآن ←',()=>{ clearTimeout(autoNextTimer); closeRes(); tournNextRound(); });
-    startCountdown(4, ()=>tournNextRound());
+    showRes('🤝', 'تعادل!', `جولة ${roundN+1} خلال 4 ثوانٍ...`);
+    setResBtn('التالي الآن ←', () => { clearTimer(); closeRes(); nextRound(); });
+    startCD(4, nextRound);
   } else {
     scores[w]++;
-    document.getElementById('scX').textContent=scores.X;
-    document.getElementById('scO').textContent=scores.O;
-    const wname=w==='X'?p1nm:p2nm;
-    const done=scores.X>=2||scores.O>=2||roundN>=3;
-    const iWon=(w==='X'&&myId===p1id)||(w==='O'&&myId===p2id);
-    iWon?sfxWin():sfxLose();
-    if(done){
-      const mw=scores.X>scores.O?'X':scores.O>scores.X?'O':'draw';
-      showRes(w==='X'?'❌':'⭕','🏆 فاز '+wname+'!','نهاية المباراة');
-      setResBtn('التالي ←',()=>{ clearTimeout(autoNextTimer); closeRes(); tournEndMatch(mw); });
-      startCountdown(4, ()=>tournEndMatch(mw));
+    document.getElementById('sc'+w).textContent = scores[w];
+    const wname = w==='X' ? p1nm : p2nm;
+    const done = scores.X>=2 || scores.O>=2 || roundN>=3;
+    const iWon = (w==='X'&&myId===p1id)||(w==='O'&&myId===p2id);
+    iWon ? sfxWin() : sfxLose();
+    if (done) {
+      const mw = scores.X>scores.O ? 'X' : scores.O>scores.X ? 'O' : 'draw';
+      showRes(w==='X'?'❌':'⭕', '🏆 فاز ' + wname + '!', 'نهاية المباراة');
+      setResBtn('النتيجة ←', () => { clearTimer(); closeRes(); endMatch(mw); });
+      startCD(4, () => endMatch(mw));
     } else {
-      showRes(w==='X'?'❌':'⭕','فاز '+wname+'!','جولة '+(roundN+1)+' خلال 4 ثوانٍ...');
-      setResBtn('التالي الآن ←',()=>{ clearTimeout(autoNextTimer); closeRes(); tournNextRound(); });
-      startCountdown(4, ()=>tournNextRound());
+      showRes(w==='X'?'❌':'⭕', 'فاز ' + wname + '!', `جولة ${roundN+1} خلال 4 ثوانٍ...`);
+      setResBtn('التالي الآن ←', () => { clearTimer(); closeRes(); nextRound(); });
+      startCD(4, nextRound);
     }
   }
 }
 
-function tournNextRound(){
-  roundN++;
-  board=Array(9).fill(null); curTurn='X';
-  document.getElementById('rnInfo').textContent='جولة '+roundN;
-  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('win'));
-  // P1 يكتب الجولة الجديدة
-  if(myId===p1id){
-    const empty={};for(let i=0;i<9;i++)empty[i]='_';
-    db.ref(`xo/${roomCode}/boards/${currentMatchId}`).update({
-      board:empty, turn:'X', round:roundN, sx:scores.X, so:scores.O
-    });
+function nextRound() {
+  roundN++; board = Array(9).fill(null); curTurn = 'X';
+  document.getElementById('rnLabel').textContent = 'جولة ' + roundN;
+  document.querySelectorAll('.cell').forEach(c => c.classList.remove('win'));
+  if (myId === p1id) {
+    const empty = {}; for (let i=0;i<9;i++) empty[i]='_';
+    db.ref(`xo2/${roomCode}/boards/${matchId}`).update({ board:empty, turn:'X', round:roundN, sx:scores.X, so:scores.O });
   }
-  gameOn=false;
-  setTimeout(()=>{ gameOn=true; listenMatchBoard(); }, 400);
+  gameOn = false;
+  setTimeout(() => {
+    gameOn = true; renderBoard(); updateTurnUI();
+    const mt=(curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
+    document.getElementById('myTurnMsg').textContent = mt ? '🎯 دورك!' : 'انتظر دورك...';
+    listenBoard();
+  }, 400);
 }
 
-function tournEndMatch(mw){
-  if(mw==='draw'){
-    // تعادل تام → جولة فاصلة
-    showRes('⚡','تعادل تام!','جولة فاصلة');
-    setResBtn('جولة فاصلة ⚡',()=>{ closeRes(); scores={X:0,O:0}; roundN=1; tournNextRound(); });
+function endMatch(mw) {
+  if (mw === 'draw') {
+    showRes('⚡', 'تعادل تام!', 'جولة فاصلة');
+    setResBtn('جولة فاصلة ⚡', () => { closeRes(); scores={X:0,O:0}; roundN=0; nextRound(); });
     return;
   }
-  const wid=mw==='X'?p1id:p2id;
-  const lid2=mw==='X'?p2id:p1id;
-  // اكتب النتيجة
-  db.ref(`xo/${roomCode}/boards/${currentMatchId}`).update({ winner:wid, loser:lid2 });
+  const wid = mw==='X' ? p1id : p2id;
+  const lid2 = mw==='X' ? p2id : p1id;
+  db.ref(`xo2/${roomCode}/boards/${matchId}`).update({ winner: wid, loser: lid2 });
 }
 
-function onTournMatchDone(winnerId){
-  const loserP=tourn.players.find(p=>p.id!==(winnerId===p1id?p2id:p1id)? false: p.id===(winnerId===p1id?p2id:p1id));
-  // تبسيط
-  const loserId=winnerId===p1id?p2id:p1id;
-  const loser=tourn.players.find(p=>p.id===loserId);
-  const winner=tourn.players.find(p=>p.id===winnerId);
-  if(loser) loser.out=true;
-  if(winner) winner.wins=(winner.wins||0)+1;
-  const active=tourn.players.filter(p=>!p.out);
-  if(active.length<=1){
+function onMatchEnd(winnerId) {
+  const loserId = winnerId===p1id ? p2id : p1id;
+  if (players[loserId]) players[loserId].out = true;
+  if (players[winnerId]) players[winnerId].wins = (players[winnerId].wins||0)+1;
+  const active = Object.values(players).filter(p => !p.out);
+  if (active.length <= 1) {
+    setTimeout(() => showFinal(active[0]?.name || players[winnerId]?.name || 'بطل', '🏆 بطل البطولة!'), 500);
+    return;
+  }
+  const iWon = myId === winnerId;
+  if (iWon) {
     sfxWin();
-    setTimeout(()=>showFinal(active[0]?.name||winner?.name||'بطل','🏆 بطل البطولة!'), 500);
-    return;
-  }
-  const iWon=myId===winnerId;
-  if(iWon){
-    showRes('🏆','تقدمت للجولة التالية!','');
-    setResBtn('متابعة ←',()=>{ clearTimeout(autoNextTimer); closeRes(); show('scrTournament'); renderTourn('⏳ في انتظار دورك...'); checkAndSetupNextMatches(); });
-    startCountdown(4,()=>{ closeRes(); show('scrTournament'); renderTourn('⏳ في انتظار دورك...'); checkAndSetupNextMatches(); });
+    showRes('🏆', 'تقدمت للجولة التالية!', '');
+    setResBtn('متابعة ←', () => { clearTimer(); closeRes(); goNextRound(); });
+    startCD(4, goNextRound);
   } else {
-    showRes('💔','خرجت من البطولة','');
-    setResBtn('مشاهدة النتائج',()=>{ clearTimeout(autoNextTimer); closeRes(); show('scrTournament'); renderTourn('❌ أنت خرجت من البطولة'); });
-    startCountdown(4,()=>{ closeRes(); show('scrTournament'); renderTourn('❌ أنت خرجت من البطولة'); });
+    sfxLose();
+    showRes('💔', 'خرجت من البطولة', '');
+    setResBtn('مشاهدة النتائج', () => { clearTimer(); closeRes(); show('scnTournament'); renderTourn('❌ أنت خرجت من البطولة'); });
+    startCD(4, () => { closeRes(); show('scnTournament'); renderTourn('❌ أنت خرجت من البطولة'); });
   }
 }
 
-function checkAndSetupNextMatches(){
-  // الليدر يُعدّ المباريات التالية
-  const active=tourn.players.filter(p=>!p.out);
-  if(active.length<=1) return;
-  if(isLeader){
-    // انتظر حتى تنتهي كل المباريات (فحص بسيط بعد 2 ثانية)
-    setTimeout(()=>{
-      const shuffled=[...active].sort(()=>Math.random()-0.5);
-      for(let i=0;i<shuffled.length;i+=2){
-        if(!shuffled[i+1]) continue;
+function goNextRound() {
+  iAmPlayer = false;
+  show('scnTournament');
+  renderTourn('⏳ في انتظار دورك...');
+  const active = Object.values(players).filter(p => !p.out);
+  if (isLeader) {
+    setTimeout(() => {
+      const shuffled = [...active].sort(() => Math.random()-.5);
+      const writes = [];
+      for (let i=0;i<shuffled.length;i+=2) {
         const a=shuffled[i], b=shuffled[i+1];
-        db.ref(`xo/${roomCode}/myMatch/${a.id}`).set(b.id);
-        db.ref(`xo/${roomCode}/myMatch/${b.id}`).set(a.id);
+        if (!b) continue;
+        writes.push(db.ref(`xo2/${roomCode}/myMatch/${a.id}`).set(b.id));
+        writes.push(db.ref(`xo2/${roomCode}/myMatch/${b.id}`).set(a.id));
       }
+      Promise.all(writes);
     }, 2000);
   }
-  waitForMyMatch();
+  waitForMatch();
 }
 
-let currentMatchId=null;
+/* ══════════════════════════════════════════
+   UI HELPERS
+══════════════════════════════════════════ */
+function updateBattleUI() {
+  document.getElementById('bP1').textContent = p1nm;
+  document.getElementById('bP2').textContent = p2nm;
+  document.getElementById('scX').textContent = scores.X;
+  document.getElementById('scO').textContent = scores.O;
+  document.getElementById('rnLabel').textContent = 'جولة ' + roundN;
+  board = Array(9).fill(null); curTurn = 'X';
+  renderBoard(); updateTurnUI();
+  document.getElementById('myTurnMsg').textContent = myId===p1id ? '🎯 دورك!' : 'انتظر دورك...';
+}
 
-function renderTourn(msg){
-  document.getElementById('tournMsg').textContent=msg||'';
-  const sorted=[...tourn.players].sort((a,b)=>{
-    if(a.out&&!b.out) return 1;
-    if(!a.out&&b.out) return -1;
+function updateTurnUI() {
+  const b = document.getElementById('turnBadge');
+  b.textContent = 'دور ' + curTurn;
+  b.className = 'turn-badge ' + (curTurn==='X' ? 'tx' : 'to');
+}
+
+function renderTourn(msg) {
+  document.getElementById('tournMsg').textContent = msg || '';
+  const sorted = Object.values(players).sort((a,b) => {
+    if (a.out && !b.out) return 1;
+    if (!a.out && b.out) return -1;
     return (b.wins||0)-(a.wins||0);
   });
-  document.getElementById('trList').innerHTML=sorted.map((p,i)=>{
-    const isMe=p.id===myId;
-    const icon=i===0&&!p.out?'👑':p.out?'❌':'✅';
-    return `<div class="trow ${p.out?'out':'act'}" style="${isMe?'border-color:rgba(0,212,255,0.5);':''}">
-      <span>${icon}</span>
-      <span>${p.av}</span>
-      <span style="flex:1;font-weight:700;font-size:0.82rem;">${p.name}${isMe?' (أنت)':''}</span>
-      <span style="font-size:0.62rem;color:var(--gold);">${p.wins||0}✓</span>
+  document.getElementById('trList').innerHTML = sorted.map((p,i) => {
+    const icon = i===0&&!p.out ? '👑' : p.out ? '❌' : '✅';
+    const isMe = p.id===myId;
+    return `<div class="trow ${p.out?'out':'act'}" style="${isMe?'border-color:rgba(0,212,255,.5);':''}">
+      <span>${icon}</span><span>${p.av}</span>
+      <span style="flex:1;font-weight:700;font-size:.82rem;">${p.name}${isMe?' (أنت)':''}</span>
+      <span style="font-size:.62rem;color:var(--gold);">${p.wins||0}✓</span>
     </div>`;
   }).join('');
 }
 
-/* ══ cellClick routes to AI or tournament ══ */
-function cellClick(i){
-  if(vsAI){
-    // AI mode — original logic
-    if(!gameOn||board[i]) return;
-    if(board[i]!==null&&board[i]!==undefined&&board[i]!=='_') return;
-    if(mySymbol!==curTurn) return;
-    board[i]=curTurn;
-    const placed=curTurn;
-    curTurn=curTurn==='X'?'O':'X';
-    renderBoard();updateTurnUI();
-    initXOAudio();placed==='X'?sfxX():sfxO();
-    const w=checkWin(board);
-    const filled=board.filter(v=>v!==null&&v!=='_').length;
-    if(w){ gameOn=false; onRoundEnd(w); }
-    else if(filled>=9){ gameOn=false; onRoundEnd('draw'); }
-    else setTimeout(aiMove,400+Math.random()*400);
-    return;
-  }
-  // Tournament mode
-  if(!xoIAm||!currentMatchId) return;
-  if(!gameOn||board[i]) return;
-  const myTurn=(curTurn==='X'&&myId===p1id)||(curTurn==='O'&&myId===p2id);
-  if(!myTurn) return;
-  initXOAudio(); curTurn==='X'?sfxX():sfxO();
-  gameOn=false;
-  const nb=[...board]; nb[i]=curTurn;
-  const nt=curTurn==='X'?'O':'X';
-  const bo={}; nb.forEach((v,j)=>{ bo[j]=(v&&v!==null)?v:'_'; });
-  db.ref(`xo/${roomCode}/boards/${currentMatchId}`).update({board:bo,turn:nt})
-    .then(()=>{ gameOn=true; }).catch(()=>{ gameOn=true; });
-}
-
-function playAgain(){
-  if(vsAI){
-    scores={X:0,O:0};roundN=1;buildBoard();
-    show('scrBattle');setupUI(p1nm,p2nm);startRoundAI();
-  } else { show('scrLobby'); }
-}
-
-/* ══ AUDIO ENGINE ══ */
-let xoAudioCtx=null;
-let xoMusicOn=localStorage.getItem('xo_music')!=='off';
-let xoMasterGain=null;
-let xoBgNodes=[];
-
-function initXOAudio(){
-  if(xoAudioCtx)return;
-  xoAudioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  xoMasterGain=xoAudioCtx.createGain();
-  xoMasterGain.gain.value=0.15;
-  xoMasterGain.connect(xoAudioCtx.destination);
-  if(xoMusicOn)startXOMusic();
-}
-document.addEventListener('touchstart',initXOAudio,{once:true});
-document.addEventListener('click',initXOAudio,{once:true});
-
-function playTone(freq,dur,vol=0.2,type='sine',delay=0){
-  if(!xoAudioCtx)return;
-  const o=xoAudioCtx.createOscillator();
-  const g=xoAudioCtx.createGain();
-  o.type=type;o.frequency.value=freq;
-  g.gain.setValueAtTime(0,xoAudioCtx.currentTime+delay);
-  g.gain.linearRampToValueAtTime(vol,xoAudioCtx.currentTime+delay+0.02);
-  g.gain.exponentialRampToValueAtTime(0.001,xoAudioCtx.currentTime+delay+dur);
-  o.connect(g);g.connect(xoAudioCtx.destination);
-  o.start(xoAudioCtx.currentTime+delay);
-  o.stop(xoAudioCtx.currentTime+delay+dur+0.05);
-}
-
-// X click sound — sharp strike
-function sfxX(){playTone(220,0.12,0.25,'sawtooth');playTone(330,0.08,0.12,'sine',0.06);}
-// O click sound — soft bell
-function sfxO(){playTone(528,0.18,0.2,'sine');playTone(792,0.12,0.1,'sine',0.05);}
-// Win sound — ascending fanfare
-function sfxWin(){[523,659,784,1047].forEach((f,i)=>playTone(f,0.25,0.18,'sine',i*0.12));}
-// Draw sound — neutral thud
-function sfxDraw(){playTone(330,0.15,0.2,'triangle');playTone(220,0.2,0.15,'triangle',0.1);}
-// Lose sound — descending
-function sfxLose(){[392,330,262,196].forEach((f,i)=>playTone(f,0.2,0.15,'sawtooth',i*0.1));}
-// Button click
-function sfxClick(){playTone(660,0.07,0.12,'sine');}
-// Ready/confirm
-function sfxConfirm(){playTone(440,0.08,0.15,'sine');playTone(880,0.12,0.18,'sine',0.1);}
-// Join room
-function sfxJoin(){[330,440,550].forEach((f,i)=>playTone(f,0.1,0.15,'sine',i*0.08));}
-// Turn change
-function sfxTurn(){playTone(440,0.06,0.1,'sine');}
-
-/* BG Music — gentle XO theme */
-function startXOMusic(){
-  if(!xoAudioCtx||!xoMusicOn)return;
-  stopXOMusic();
-  const scale=[261,294,330,349,392,440,494,523];
-  const mel=[0,2,4,5,4,2,0,2,4,7,5,4,2,4,2,0];
-  const bpm=72,beat=60/bpm;
-  function sched(start){
-    if(!xoMusicOn)return;
-    mel.forEach((n,i)=>{
-      const t=start+i*beat;
-      const o=xoAudioCtx.createOscillator();const g=xoAudioCtx.createGain();
-      o.type='sine';o.frequency.value=scale[n]*2;
-      g.gain.setValueAtTime(0,xoAudioCtx.currentTime+t);
-      g.gain.linearRampToValueAtTime(0.06,xoAudioCtx.currentTime+t+0.04);
-      g.gain.exponentialRampToValueAtTime(0.001,xoAudioCtx.currentTime+t+beat*0.7);
-      o.connect(g);g.connect(xoMasterGain);o.start(xoAudioCtx.currentTime+t);o.stop(xoAudioCtx.currentTime+t+beat);
-      xoBgNodes.push(o);
-    });
-    const len=mel.length*beat;
-    const tid=setTimeout(()=>sched(0),Math.max(0,(len-0.1)*1000));
-    xoBgNodes.push({stop:()=>clearTimeout(tid)});
-  }
-  sched(0.1);
-}
-function stopXOMusic(){xoBgNodes.forEach(n=>{try{n.stop?n.stop():null;}catch(e){}});xoBgNodes=[];}
-function toggleXOMusic(){
-  xoMusicOn=!xoMusicOn;localStorage.setItem('xo_music',xoMusicOn?'on':'off');
-  if(xoMusicOn){if(xoMasterGain)xoMasterGain.gain.value=0.15;initXOAudio();startXOMusic();}
-  else stopXOMusic();
-}
-
-/* ══ SETTINGS PANEL ══ */
-let xoSettingsOpen=false;
-function toggleXOSettings(){
-  xoSettingsOpen=!xoSettingsOpen;
-  const p=document.getElementById('xoSettingsPanel');
-  if(xoSettingsOpen){renderXOSettings();p.style.display='flex';}
-  else p.style.display='none';
-}
-function renderXOSettings(){
-  document.getElementById('xoMusicIcon').textContent=xoMusicOn?'🎵':'🔇';
-  document.getElementById('xoMusicLabel').textContent=xoMusicOn?'إيقاف الموسيقى':'تشغيل الموسيقى';
-  document.getElementById('xoMusicBadge').textContent=xoMusicOn?'شغّال':'مكتوم';
-}
-function xoConfirmLeave(){
-  toggleXOSettings();
-  if(confirm('العودة لقائمة الألعاب؟')){
-    if(lobbyRef){lobbyRef.off();lobbyRef=null;}
-    if(matchRef){matchRef.off();matchRef=null;}
-    if(roomCode)db.ref(`xo/${roomCode}/players/${myId}`).remove();
-    roomCode='';vsAI=false;
-    window.location.href='index.html';
+function showFinal(name, sub) {
+  closeRes(); clearTimer(); stopMusic();
+  document.getElementById('winTrophy').textContent = '🏆';
+  document.getElementById('winName').textContent = name;
+  document.getElementById('winSub').textContent = sub || '';
+  show('scnWinner'); sfxWin();
+  for (let i=0;i<15;i++) {
+    const d=document.createElement('div'); d.className='pt';
+    d.style.cssText=`left:${Math.random()*100}vw;width:${3+Math.random()*4}px;height:${3+Math.random()*4}px;background:rgba(255,215,0,.7);animation-duration:${4+Math.random()*5}s;animation-delay:-${Math.random()*3}s;`;
+    document.body.appendChild(d); setTimeout(()=>d.remove(),9000);
   }
 }
-document.addEventListener('click',e=>{
-  if(xoSettingsOpen&&!e.target.closest('#xoSettingsPanel')&&!e.target.closest('#xoSettingsBtn')){
-    xoSettingsOpen=false;document.getElementById('xoSettingsPanel').style.display='none';
+
+/* ══════════════════════════════════════════
+   RESULT OVERLAY
+══════════════════════════════════════════ */
+function showRes(emi, tit, sub) {
+  document.getElementById('rEmi').textContent = emi;
+  document.getElementById('rTit').textContent = tit;
+  document.getElementById('rSub').textContent = sub;
+  document.getElementById('resOverlay').style.display = 'flex';
+}
+function closeRes() { document.getElementById('resOverlay').style.display = 'none'; document.getElementById('rCountdown').textContent = ''; }
+function setResBtn(label, fn) { document.getElementById('rBtn').textContent = label; rBtnFn = fn; }
+function clearTimer() { clearTimeout(autoTimer); document.getElementById('rCountdown').textContent = ''; }
+function startCD(secs, fn) {
+  clearTimer();
+  let r = secs;
+  document.getElementById('rCountdown').textContent = r;
+  const tick = () => {
+    r--;
+    if (r <= 0) { document.getElementById('rCountdown').textContent = ''; fn(); return; }
+    document.getElementById('rCountdown').textContent = r;
+    autoTimer = setTimeout(tick, 1000);
+  };
+  autoTimer = setTimeout(tick, 1000);
+}
+
+/* ══════════════════════════════════════════
+   VS AI
+══════════════════════════════════════════ */
+function openDiff() { document.getElementById('diffModal').style.display = 'flex'; }
+
+function startVsAI(diff) {
+  document.getElementById('diffModal').style.display = 'none';
+  vsAI = true; aiDiff = diff;
+  p1id = myId; p2nm = '🤖 '+{easy:'سهل',medium:'متوسط',hard:'صعب'}[diff];
+  p1nm = myName; p2id = 'AI'; mySymbol = 'X';
+  scores = {X:0,O:0}; roundN = 1; iAmPlayer = true;
+  buildBoard(); show('scnBattle'); updateBattleUI();
+  board = Array(9).fill(null); curTurn = 'X'; gameOn = true;
+  renderBoard(); updateTurnUI();
+  document.getElementById('myTurnMsg').textContent = '🎯 دورك!';
+  if (musicOn) startMusic();
+}
+
+function aiCellClick(i) {
+  if (!gameOn || board[i] || mySymbol !== curTurn) return;
+  board[i] = curTurn; const placed = curTurn;
+  curTurn = curTurn==='X'?'O':'X';
+  renderBoard(); updateTurnUI();
+  initAudio(); placed==='X' ? sfxX() : sfxO();
+  const w = checkWin(board);
+  const filled = board.filter(v=>v!==null).length;
+  if (w) { gameOn=false; aiOnRoundEnd(w); }
+  else if (filled>=9) { gameOn=false; aiOnRoundEnd('draw'); }
+  else setTimeout(aiMove, 400+Math.random()*400);
+}
+
+function aiMove() {
+  if (!gameOn) return;
+  document.getElementById('aiThink').style.display = 'flex';
+  setTimeout(() => {
+    document.getElementById('aiThink').style.display = 'none';
+    const i = botMove(board, curTurn);
+    if (i !== -1) {
+      board[i] = curTurn; const placed = curTurn;
+      curTurn = curTurn==='X'?'O':'X';
+      renderBoard(); updateTurnUI();
+      initAudio(); placed==='X' ? sfxX() : sfxO();
+      const w = checkWin(board);
+      const filled = board.filter(v=>v!==null).length;
+      if (w) { gameOn=false; aiOnRoundEnd(w); }
+      else if (filled>=9) { gameOn=false; aiOnRoundEnd('draw'); }
+    }
+  }, 400+Math.random()*400);
+}
+
+function aiOnRoundEnd(w) {
+  initAudio(); clearTimeout(autoTimer);
+  if (w==='draw') {
+    sfxDraw(); showRes('🤝','تعادل!',`جولة ${roundN+1} خلال 4 ثوانٍ...`);
+    setResBtn('التالي الآن ←', () => { clearTimer(); closeRes(); aiNextRound(); });
+    startCD(4, aiNextRound);
+  } else {
+    scores[w]++; document.getElementById('sc'+w).textContent = scores[w];
+    const wname = w==='X' ? p1nm : p2nm;
+    const done = scores.X>=2||scores.O>=2||roundN>=3;
+    const iWon = w===mySymbol;
+    iWon ? sfxWin() : sfxLose();
+    if (done) {
+      showRes(w==='X'?'❌':'⭕','🏆 فاز '+wname+'!','نهاية المباراة');
+      setResBtn('النتيجة ←',()=>{ clearTimer(); closeRes(); showFinal(iWon?myName:p2nm, scores.X+' - '+scores.O); });
+      startCD(4, ()=>showFinal(iWon?myName:p2nm, scores.X+' - '+scores.O));
+    } else {
+      showRes(w==='X'?'❌':'⭕','فاز '+wname+'!',`جولة ${roundN+1} خلال 4 ثوانٍ...`);
+      setResBtn('التالي الآن ←',()=>{ clearTimer(); closeRes(); aiNextRound(); });
+      startCD(4, aiNextRound);
+    }
+  }
+}
+
+function aiNextRound() {
+  roundN++; board=Array(9).fill(null); curTurn='X'; gameOn=true;
+  renderBoard(); updateTurnUI();
+  document.getElementById('rnLabel').textContent='جولة '+roundN;
+  document.getElementById('myTurnMsg').textContent='🎯 دورك!';
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('win'));
+}
+
+function botMove(brd, sym) {
+  const emp = brd.map((v,i)=>v===null?i:null).filter(i=>i!==null);
+  if (!emp.length) return -1;
+  const opp = sym==='X'?'O':'X';
+  if (aiDiff==='easy'&&Math.random()<.6) return emp[Math.floor(Math.random()*emp.length)];
+  // Check win/block
+  for (const i of emp) { brd[i]=sym; if(checkWin(brd)){brd[i]=null;return i;} brd[i]=null; }
+  if (aiDiff==='medium') {
+    for (const i of emp) { brd[i]=opp; if(checkWin(brd)){brd[i]=null;return i;} brd[i]=null; }
+    if (Math.random()<.4) return emp[Math.floor(Math.random()*emp.length)];
+  }
+  if (aiDiff==='hard') {
+    for (const i of emp) { brd[i]=opp; if(checkWin(brd)){brd[i]=null;return i;} brd[i]=null; }
+    let bs=-Infinity, bm=-1;
+    for (const i of emp) { brd[i]=sym; const s=mm(brd,0,false,sym,opp); brd[i]=null; if(s>bs){bs=s;bm=i;} }
+    return bm;
+  }
+  if (brd[4]===null) return 4;
+  const c=[0,2,6,8].filter(i=>brd[i]===null);
+  if (c.length) return c[Math.floor(Math.random()*c.length)];
+  return emp[Math.floor(Math.random()*emp.length)];
+}
+function mm(b,d,max,ai,hu) {
+  const w=checkWin(b);
+  if(w===ai)return 10-d; if(w===hu)return d-10;
+  if(b.every(v=>v!==null))return 0;
+  const sym=max?ai:hu; let best=max?-Infinity:Infinity;
+  for(let i=0;i<9;i++){if(!b[i]){b[i]=sym;const s=mm(b,d+1,!max,ai,hu);b[i]=null;best=max?Math.max(best,s):Math.min(best,s);}}
+  return best;
+}
+
+function playAgain() {
+  if (vsAI) { scores={X:0,O:0}; roundN=1; buildBoard(); show('scnBattle'); updateBattleUI(); board=Array(9).fill(null); curTurn='X'; gameOn=true; renderBoard(); updateTurnUI(); document.getElementById('myTurnMsg').textContent='🎯 دورك!'; }
+  else { show('scnLobby'); }
+}
+
+/* ══════════════════════════════════════════
+   CHAT
+══════════════════════════════════════════ */
+function openChat() {
+  chatOpen = true; unread = 0;
+  document.getElementById('notifDot').style.display = 'none';
+  document.getElementById('chatPopup').style.display = 'flex';
+  document.getElementById('chatBackdrop').style.display = 'block';
+  const log = document.getElementById('chatLog');
+  requestAnimationFrame(() => { log.scrollTop = log.scrollHeight; });
+  setTimeout(() => document.getElementById('chatInp').focus(), 250);
+}
+function closeChat() {
+  chatOpen = false;
+  document.getElementById('chatPopup').style.display = 'none';
+  document.getElementById('chatBackdrop').style.display = 'none';
+}
+function sendChat() {
+  const i = document.getElementById('chatInp');
+  if (i.value.trim() && roomCode && myName) {
+    db.ref(`xo2/${roomCode}/chat`).push({ u: myName, t: i.value.trim(), ts: Date.now() });
+    i.value = '';
+  }
+}
+function appendMsg(m) {
+  const isMe = m.u === myName;
+  const col = getPCol(m.u);
+  const log = document.getElementById('chatLog');
+  const d = document.createElement('div');
+  d.style.cssText = `display:flex;justify-content:${isMe?'flex-end':'flex-start'};margin-bottom:4px;`;
+  d.innerHTML = `<div class="chat-bubble ${isMe?'me':'them'}"><div class="chat-name" style="color:${col}">${m.u}</div><div class="chat-txt">${m.t}</div></div>`;
+  if (log) { log.appendChild(d); requestAnimationFrame(()=>log.scrollTop=log.scrollHeight); }
+  if (!chatOpen) {
+    unread++;
+    document.getElementById('notifDot').style.display = 'block';
+  }
+}
+
+/* ══════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════ */
+function toggleSett() {
+  settOpen = !settOpen;
+  document.getElementById('settPanel').style.display = settOpen ? 'flex' : 'none';
+}
+document.addEventListener('click', e => {
+  if (settOpen && !e.target.closest('#settPanel') && !e.target.closest('#settBtn')) {
+    settOpen = false; document.getElementById('settPanel').style.display = 'none';
   }
 });
+function toggleMusic() {
+  musicOn = !musicOn; localStorage.setItem('xo_music', musicOn?'on':'off');
+  document.getElementById('musicIcon').textContent = musicOn ? '🎵' : '🔇';
+  document.getElementById('musicLabel').textContent = musicOn ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى';
+  if (musicOn) { initAudio(); startMusic(); } else stopMusic();
+}
+function confirmLeave() {
+  if (confirm('العودة لقائمة الألعاب؟')) { cleanup(); window.location.href = 'index.html'; }
+}
 
-/* ══ SOUNDS integrated directly in game functions ══ */
+/* ══════════════════════════════════════════
+   AUDIO
+══════════════════════════════════════════ */
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  masterGain = audioCtx.createGain(); masterGain.gain.value = 0.15;
+  masterGain.connect(audioCtx.destination);
+  if (musicOn) startMusic();
+}
+document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('touchstart', initAudio, { once: true });
+
+function tone(freq, dur, vol=.2, type='sine', delay=0) {
+  if (!audioCtx) return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(0,audioCtx.currentTime+delay);
+  g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+delay+.02);
+  g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+delay+dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(audioCtx.currentTime+delay); o.stop(audioCtx.currentTime+delay+dur+.05);
+}
+function sfxX(){tone(220,.12,.25,'sawtooth');tone(330,.08,.12,'sine',.06);}
+function sfxO(){tone(528,.18,.2,'sine');tone(792,.12,.1,'sine',.05);}
+function sfxWin(){[523,659,784,1047].forEach((f,i)=>tone(f,.25,.18,'sine',i*.12));}
+function sfxLose(){[392,330,262,196].forEach((f,i)=>tone(f,.2,.15,'sawtooth',i*.1));}
+function sfxDraw(){tone(330,.15,.2,'triangle');tone(220,.2,.15,'triangle',.1);}
+function sfxClick(){tone(660,.07,.12,'sine');}
+
+function startMusic() {
+  if (!audioCtx || !musicOn) return;
+  stopMusic();
+  const scale=[261,294,330,349,392,440,494,523];
+  const mel=[0,2,4,5,4,2,0,2,4,7,5,4,2,4,2,0];
+  const beat=60/72;
+  function sched(start) {
+    if (!musicOn) return;
+    mel.forEach((n,i)=>{
+      const t=start+i*beat;
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=scale[n]*2;
+      g.gain.setValueAtTime(0,audioCtx.currentTime+t);
+      g.gain.linearRampToValueAtTime(.055,audioCtx.currentTime+t+.04);
+      g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+t+beat*.7);
+      o.connect(g); g.connect(masterGain);
+      o.start(audioCtx.currentTime+t); o.stop(audioCtx.currentTime+t+beat);
+      bgNodes.push(o);
+    });
+    const tid=setTimeout(()=>sched(0),(mel.length*beat-.1)*1000);
+    bgNodes.push({stop:()=>clearTimeout(tid)});
+  }
+  sched(.1);
+}
+function stopMusic(){bgNodes.forEach(n=>{try{n.stop?n.stop():null;}catch(e){}});bgNodes=[];}
 </script>
 </body>
 </html>
