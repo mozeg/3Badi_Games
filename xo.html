@@ -303,7 +303,7 @@ if(sN){
 /* ══ HELPERS ══ */
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
 function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',3000);}
-function goBack(){cleanup();window.location.href='index.html';}
+function goBack(){finalShown=false;cleanup();window.location.href='index.html';}
 function cleanup(){if(gameRef){gameRef.off();gameRef=null;}if(gameCode){db.ref(`xo3/${gameCode}`).remove();}gameCode='';vsAI=false;gameOn=false;}
 function confirmLeave(){if(confirm('العودة لقائمة الألعاب؟')){cleanup();window.location.href='index.html';}}
 function copyCode(){navigator.clipboard?.writeText(gameCode).then(()=>{}).catch(()=>{});alert('تم نسخ الكود: '+gameCode);}
@@ -678,7 +678,9 @@ function startCD(secs,fn){
   const tick=()=>{r--;if(r<=0){document.getElementById('rCountdown').textContent='';fn();return;}document.getElementById('rCountdown').textContent=r;autoTimer=setTimeout(tick,1000);};
   autoTimer=setTimeout(tick,1000);
 }
+let finalShown=false;
 function showFinal(name,sub){
+  if(finalShown)return; finalShown=true;
   closeRes();clearTimer();stopMusic();
   document.getElementById('winTrophy').textContent='🏆';
   document.getElementById('winName').textContent=name;
@@ -700,6 +702,7 @@ function showFinal(name,sub){
 }
 
 function returnToGame(){
+  finalShown=false;
   clearTimeout(winTimer);
   // إعادة تهيئة لعبة جديدة بين نفس اللاعبين
   if(vsAI){
